@@ -95,15 +95,26 @@ export class MarsDateBase {
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
 
-    this.julianDateTT = this.getJulianDateTT();
-    this.j2000offset = this.julianDateTT - 2451545;
-    this.marsEOC = this.getMarsEquationOfCentre();
-    this.ls = this.calculateLs();
-    this.marsEOT = this.getMarsEOT();
-    this.MST = this.calculateMST();
+    this.julianDateTT = this.getJulianDateTT(); // A-5
+    this.j2000offset = this.getJ2000Offset(); // A-6
+    this.marsEOC = this.getMarsEquationOfCentre(); // B-4
+    this.ls = this.calculateLs(); // B-5
+    this.marsEOT = this.getMarsEOT(); // C-1
+    this.MST = this.calculateMST(); // C-2
   }
 
-  private getUTCtoTTConversion(JDut, epoch) {
+  private getJulianDateTT() {
+    const epoch = this.earthDate.getTime(); // A-1
+    const JDut = 2440587.5 + epoch / 86400000; // A-2
+    const TTUTC = this.getUTCtoTTConversion(epoch); // A-4
+    return JDut + TTUTC / 86400;
+  }
+
+  private getJ2000Offset() {
+    return this.julianDateTT - 2451545;
+  }
+
+  private getUTCtoTTConversion(epoch) {
     if (epoch >= 0) {
       const mostRecentLeapSecondEpoch = Object.keys(LEAP_SECONDS).find(
         (ls) => Number(ls) >= epoch
@@ -111,7 +122,7 @@ export class MarsDateBase {
 
       return LEAP_SECONDS[mostRecentLeapSecondEpoch] + TAI_UTC_DIFF;
     } else {
-      const jOff = (JDut - 2451545.0) / 36525;
+      const jOff = this.j2000offset / 36525; // A-3
 
       return (
         64.184 +
@@ -123,11 +134,10 @@ export class MarsDateBase {
     }
   }
 
-  private getJulianDateTT() {
-    const epoch = this.earthDate.getTime();
-    const JDut = 2440587.5 + epoch / 86400000;
-    const TTUTC = this.getUTCtoTTConversion(JDut, epoch);
-    return JDut + TTUTC / 86400;
+  private calculateMarsEpoc() {
+    const j2000 = -17023.002;
+    const juliandDateUt = j2000 + 2451545;
+    const intermediate = juliandDateUt * 86400;
   }
 
   private getMarsPerturbers() {
@@ -143,9 +153,9 @@ export class MarsDateBase {
   }
 
   private getMarsEquationOfCentre() {
-    const M = 19.3871 + 0.52402073 * this.j2000offset;
+    const M = 19.3871 + 0.52402073 * this.j2000offset; // B-1
 
-    const perturbers = this.getMarsPerturbers();
+    const perturbers = this.getMarsPerturbers(); // B-3
 
     return (
       (10.691 + 0.0000003 * this.j2000offset) * sin(M) +
@@ -158,7 +168,7 @@ export class MarsDateBase {
   }
 
   private calculateLs() {
-    const aFMS = 270.3871 + 0.524038496 * this.j2000offset;
+    const aFMS = 270.3871 + 0.524038496 * this.j2000offset; // B-2
     const EOC = this.marsEOC;
     const ls = (aFMS + EOC) % 360;
     if (ls < 0) {
@@ -184,11 +194,13 @@ export class MarsDateBase {
   }
 
   protected calculateLMST(lon: number) {
+    // C-3
     const time = this.calculateMST() - (lon * 24) / 360;
     return (time + 24) % 24;
   }
 
   protected calculateLTST(lon: number) {
+    // C-4
     return this.calculateLMST(lon) + this.marsEOT * (24 / 360);
   }
 }
