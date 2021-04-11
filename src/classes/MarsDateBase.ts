@@ -79,6 +79,10 @@ const PERTURBERS = [
 // seconds to the value of TAI-UTC.
 const TAI_UTC_DIFF = 32.184;
 
+const MARS_YEAR_EPOCH = new Date(-524102400000);
+const MARS_SOLS_IN_YEAR = 668.5991;
+const MARS_SECONDS_IN_SOL = 24 * 60 * 60 + 39 * 60 + 35.244; // 24 hours, 39 minutes, 35.244 seconds
+
 const cos = (deg: number) => Math.cos((deg * Math.PI) / 180);
 const sin = (deg: number) => Math.sin((deg * Math.PI) / 180);
 
@@ -86,6 +90,7 @@ export class MarsDateBase {
   protected earthDate: Date;
   protected ls: number;
   protected MST: number;
+  protected marsYear: number;
 
   private julianDateTT: number;
   private j2000offset: number;
@@ -94,6 +99,7 @@ export class MarsDateBase {
 
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
+    this.marsYear = this.getMarsYear();
 
     this.julianDateTT = this.getJulianDateTT(); // A-5
     this.j2000offset = this.getJ2000Offset(); // A-6
@@ -101,6 +107,14 @@ export class MarsDateBase {
     this.ls = this.calculateLs(); // B-5
     this.marsEOT = this.getMarsEOT(); // C-1
     this.MST = this.calculateMST(); // C-2
+  }
+
+  private getMarsYear() {
+    const secondsSinceMarsEpoch =
+      (this.earthDate.getTime() - MARS_YEAR_EPOCH.getTime()) / 1000;
+    const marsYearsSinceMarsEpoch =
+      secondsSinceMarsEpoch / (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR);
+    return Math.floor(marsYearsSinceMarsEpoch);
   }
 
   private getJulianDateTT() {
@@ -132,12 +146,6 @@ export class MarsDateBase {
         16.4 * Math.pow(jOff, 4)
       );
     }
-  }
-
-  private calculateMarsEpoc() {
-    const j2000 = -17023.002;
-    const juliandDateUt = j2000 + 2451545;
-    const intermediate = juliandDateUt * 86400;
   }
 
   private getMarsPerturbers() {

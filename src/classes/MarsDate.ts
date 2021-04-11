@@ -20,7 +20,7 @@ export class MarsDate extends MarsDateBase {
     const minuteString = addLeadingZero(minute.toString(), 2);
     const secondString = addLeadingZero(second.toString(), 2);
 
-    return `${hourString}:${minuteString}:${secondString}`;
+    return `MY${this.marsYear} ${hourString}:${minuteString}:${secondString}`;
   }
 
   /****************************************************
