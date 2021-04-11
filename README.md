@@ -26,4 +26,7 @@ marsDate.getLMST(landingSiteLongitude); // Returns Local Mean Solar Time at a sp
 
 marsDate.getLTST(landingSiteLongitude); // Returns Local True Solar Time at a specific longitude
 // "00:00:01"
+
+marsDate.getYear(); // Returns the Mars Year, with Year 1 beginning April 11 1955 at 00:00:00 UTC
+// 26
 ```

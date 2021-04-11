@@ -46,4 +46,8 @@ export class MarsDate extends MarsDateBase {
   public getLTST(lon: number) {
     return this.formatTime(this.calculateLTST(lon));
   }
+
+  public getYear() {
+    return this.marsYear;
+  }
 }
