@@ -179,6 +179,36 @@ export class MarsDate {
     );
   }
 
+  private calculateMST() {
+    const msd =
+      (this.julianDateTT - 2451549.5) / 1.0274912517 + 44796 - 0.0009626;
+    return (24 * msd) % 24;
+  }
+
+  private calculateLMST(lon: number) {
+    const time = this.calculateMST() - (lon * 24) / 360;
+    return (time + 24) % 24;
+  }
+
+  private calculateLTST(lon: number) {
+    return this.calculateLMST(lon) + this.marsEOT * (24 / 360);
+  }
+
+  private formatTime(time: number) {
+    const addLeadingZero = (num: number) => {
+      return ("0" + num).slice(-2);
+    };
+
+    const hour = Math.floor(time);
+    const minsLeft = (time - hour) * 60;
+    const minute = Math.floor(minsLeft);
+    const second = Math.floor((minsLeft - minute) * 60);
+
+    return `${addLeadingZero(hour)}:${addLeadingZero(minute)}:${addLeadingZero(
+      second
+    )}`;
+  }
+
   /****************************************************
   Public Methods for Fetching Time Data
   *****************************************************/
@@ -190,19 +220,16 @@ export class MarsDate {
 
   // Mean Solar Time at Airy Crater (Lon 0 deg)
   public getMST() {
-    const msd =
-      (this.julianDateTT - 2451549.5) / 1.0274912517 + 44796 - 0.0009626;
-    return (24 * msd) % 24;
+    return this.formatTime(this.calculateMST());
   }
 
   // Local Mean Solar Time at a specific longitude
-  public getLMST(longitude: number) {
-    const time = this.getMST() - (longitude * 24) / 360;
-    return (time + 24) % 24;
+  public getLMST(lon: number) {
+    return this.formatTime(this.calculateLMST(lon));
   }
 
   // Local True Solar Time at a specific longitude
-  public getLTST(longitude: number) {
-    return this.getLMST(longitude) + this.marsEOT * (24 / 360);
+  public getLTST(lon: number) {
+    return this.formatTime(this.calculateLTST(lon));
   }
 }
