@@ -1,7 +1,8 @@
 import { MarsDate } from "./classes/MarsDate";
 
-const spiritLanding = new Date(1073137591000);
-const SPIRIT_LON = 184.702;
+const spiritLanding = new Date(1073190900000);
+console.log(spiritLanding);
+const SPIRIT_LON = 184.527364;
 
 const now = new Date();
 const MARS_PRIME_MERIDIEN = 0;
