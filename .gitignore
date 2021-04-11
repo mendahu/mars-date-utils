@@ -1,0 +1,11 @@
+# env
+.env
+.env.prod
+
+# node modules
+node_modules/
+
+# dist
+dist/
+
+.DS_Store
