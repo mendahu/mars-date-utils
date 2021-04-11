@@ -1,3 +1,10 @@
+// Based on Allison and McEwen (2000) and revision from the Mars24 Sunclock
+// https://www.giss.nasa.gov/tools/mars24/help/algorithm.html
+
+// Leap Second additions since EPOCH Jan 1 1970
+// Will need to be updated if new leap seconds are added
+// Current as of April 2021
+// https://www.ietf.org/timezones/data/leap-seconds.list
 const LEAP_SECONDS = {
   "63100800000": 10,
   "78822000000": 11,
@@ -29,54 +36,79 @@ const LEAP_SECONDS = {
   "1483257600000": 37,
 };
 
+const PERTURBERS = [
+  {
+    A: 0.0071,
+    T: 2.2353,
+    P: 49.409,
+  },
+  {
+    A: 0.0057,
+    T: 2.7543,
+    P: 168.173,
+  },
+  {
+    A: 0.0039,
+    T: 1.1177,
+    P: 191.837,
+  },
+  {
+    A: 0.0037,
+    T: 15.7866,
+    P: 21.736,
+  },
+  {
+    A: 0.0021,
+    T: 2.1354,
+    P: 15.704,
+  },
+  {
+    A: 0.002,
+    T: 2.4694,
+    P: 95.528,
+  },
+  {
+    A: 0.0018,
+    T: 32.8493,
+    P: 49.095,
+  },
+];
+
+// it is important to note that the table provides values for the TAI-UTC difference,
+// where TAI is International Atomic Time. To obtain the TT-UTC difference, add 32.184
+// seconds to the value of TAI-UTC.
 const TAI_UTC_DIFF = 32.184;
 
+const cos = (deg: number) => Math.cos((deg * Math.PI) / 180);
+const sin = (deg: number) => Math.sin((deg * Math.PI) / 180);
+
 export class MarsDate {
-  public earthDate: Date;
-  private epoch: number;
-  private offsetFromJ2000: number;
-  private julianDateUT: number;
-  private julianOffset: number;
-  private UTCtoTTConversion: number;
+  private earthDate: Date;
+
   private julianDateTT: number;
-  private marsMeanAnomaly: number;
-  private marsAngleOfFictionMeanSun: number;
-  private marsPerturbers: number;
-  private marsEquationOfCenter: number;
+  private j2000offset: number;
+  private marsEOC: number;
+  private ls: number;
+  private marsEOT: number;
 
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
-    this.epoch = earthDate.getTime();
-    this.julianDateUT = this.getJulianDateUT(this.epoch);
-    this.UTCtoTTConversion = this.getUTCtoTTConversion(this.julianOffset);
-    this.julianDateTT = this.getJulianDateTT(
-      this.julianDateUT,
-      this.UTCtoTTConversion
-    );
-    this.offsetFromJ2000 = this.getOffsetFromJ2000(this.julianDateTT);
-    this.marsMeanAnomaly = this.getMarsMeanAnomaly(this.offsetFromJ2000);
-    this.marsAngleOfFictionMeanSun = this.getMarsAngleOfFictionMeanSun(
-      this.offsetFromJ2000
-    );
-    this.marsPerturbers = this.getMarsPerturbers(this.offsetFromJ2000);
-    this.marsEquationOfCenter = this.getMarsEquationOfCentre(
-      this.marsMeanAnomaly,
-      this.marsPerturbers
-    );
+
+    this.julianDateTT = this.getJulianDateTT();
+    this.j2000offset = this.julianDateTT - 2451545;
+    this.marsEOC = this.getMarsEquationOfCentre();
+    this.ls = this.calculateLs();
+    this.marsEOT = this.getMarsEOT();
   }
 
   public getEarthDate() {
     return this.earthDate;
   }
 
-  private getJulianDateUT(epoch) {
-    return 2440587.5 + epoch / 86400000;
-  }
-
-  private getUTCtoTTConversion(JDut) {
-    if (this.epoch >= 0) {
+  private getUTCtoTTConversion(JDut, epoch) {
+    if (epoch >= 0) {
       const mostRecentLeapSecondEpoch = Object.keys(LEAP_SECONDS).find(
-        (ls) => Number(ls) >= this.epoch
+        (ls) => Number(ls) >= epoch
       );
 
       return LEAP_SECONDS[mostRecentLeapSecondEpoch] + TAI_UTC_DIFF;
@@ -93,67 +125,18 @@ export class MarsDate {
     }
   }
 
-  private getJulianDateTT(JDut, TTUTC) {
+  private getJulianDateTT() {
+    const epoch = this.earthDate.getTime();
+    const JDut = 2440587.5 + epoch / 86400000;
+    const TTUTC = this.getUTCtoTTConversion(JDut, epoch);
     return JDut + TTUTC / 86400;
   }
 
-  private getOffsetFromJ2000(JDtt) {
-    return JDtt - 2451545;
-  }
-
-  private getMarsMeanAnomaly(jOff) {
-    return 19.3871 + 0.52402073 * jOff;
-  }
-
-  private getMarsAngleOfFictionMeanSun(jOff) {
-    return 270.3871 + 0.524038496 * jOff;
-  }
-
-  private getMarsPerturbers(jOff) {
-    const PERTURBERS = [
-      {
-        A: 0.0071,
-        T: 2.2353,
-        P: 49.409,
-      },
-      {
-        A: 0.0057,
-        T: 2.7543,
-        P: 168.173,
-      },
-      {
-        A: 0.0039,
-        T: 1.1177,
-        P: 191.837,
-      },
-      {
-        A: 0.0037,
-        T: 15.7866,
-        P: 21.736,
-      },
-      {
-        A: 0.0021,
-        T: 2.1354,
-        P: 15.704,
-      },
-      {
-        A: 0.002,
-        T: 2.4694,
-        P: 95.528,
-      },
-      {
-        A: 0.0018,
-        T: 32.8493,
-        P: 49.095,
-      },
-    ];
-
+  private getMarsPerturbers() {
     let acc: number = 0;
 
-    const cos = (deg: number) => Math.cos((deg * Math.PI) / 180);
-
     PERTURBERS.forEach((per) => {
-      const cosiner = (0.985626 * jOff) / per.T;
+      const cosiner = (0.985626 * this.j2000offset) / per.T;
       const result = per.A * cos(cosiner + per.P);
       acc += result;
     });
@@ -161,11 +144,13 @@ export class MarsDate {
     return acc;
   }
 
-  private getMarsEquationOfCentre(M, perturbers) {
-    const sin = (deg: number) => Math.sin((deg * Math.PI) / 180);
+  private getMarsEquationOfCentre() {
+    const M = 19.3871 + 0.52402073 * this.j2000offset;
+
+    const perturbers = this.getMarsPerturbers();
 
     return (
-      (10.691 + 0.0000003 * this.offsetFromJ2000) * sin(M) +
+      (10.691 + 0.0000003 * this.j2000offset) * sin(M) +
       0.623 * sin(2 * M) +
       0.05 * sin(3 * M) +
       0.005 * sin(4 * M) +
@@ -174,7 +159,45 @@ export class MarsDate {
     );
   }
 
-  public getMarsLs() {
-    return (this.marsAngleOfFictionMeanSun + this.marsEquationOfCenter) % 360;
+  private calculateLs() {
+    const aFMS = 270.3871 + 0.524038496 * this.j2000offset;
+    const EOC = this.marsEOC;
+    return (aFMS + EOC) % 360;
+  }
+
+  private getMarsEOT() {
+    const Ls = this.ls;
+    const eqCenter = this.marsEOC;
+
+    return (
+      2.861 * sin(2 * Ls) - 0.071 * sin(4 * Ls) + 0.002 * sin(6 * Ls) - eqCenter
+    );
+  }
+
+  /****************************************************
+  Public Methods for Fetching Time Data
+  *****************************************************/
+
+  // Solar Longitude - Location of Mars around the Sun, or roughly the season
+  public getLs() {
+    return this.ls;
+  }
+
+  // Mean Solar Time at Airy Crater (Lon 0 deg)
+  public getMST() {
+    const msd =
+      (this.julianDateTT - 2451549.5) / 1.0274912517 + 44796 - 0.0009626;
+    return (24 * msd) % 24;
+  }
+
+  // Local Mean Solar Time at a specific longitude
+  public getLMST(longitude: number) {
+    const time = this.getMST() - (longitude * 24) / 360;
+    return time % 24;
+  }
+
+  // Local True Solar Time at a specific longitude
+  public getLTST(longitude: number) {
+    return this.getLMST(longitude) + this.marsEOT * (24 / 360);
   }
 }
