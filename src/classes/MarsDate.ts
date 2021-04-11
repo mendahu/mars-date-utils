@@ -162,7 +162,12 @@ export class MarsDate {
   private calculateLs() {
     const aFMS = 270.3871 + 0.524038496 * this.j2000offset;
     const EOC = this.marsEOC;
-    return (aFMS + EOC) % 360;
+    const ls = (aFMS + EOC) % 360;
+    if (ls < 0) {
+      return ls + 360;
+    } else {
+      return ls;
+    }
   }
 
   private getMarsEOT() {
@@ -193,7 +198,7 @@ export class MarsDate {
   // Local Mean Solar Time at a specific longitude
   public getLMST(longitude: number) {
     const time = this.getMST() - (longitude * 24) / 360;
-    return time % 24;
+    return (time + 24) % 24;
   }
 
   // Local True Solar Time at a specific longitude
