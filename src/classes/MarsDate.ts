@@ -1,4 +1,5 @@
 import { MarsDateBase } from "./MarsDateBase";
+import { addLeadingZero } from "../helpers/index";
 
 export class MarsDate extends MarsDateBase {
   constructor(earthDate: Date) {
@@ -10,18 +11,16 @@ export class MarsDate extends MarsDateBase {
   }
 
   private formatTime(time: number) {
-    const addLeadingZero = (num: number) => {
-      return ("0" + num).slice(-2);
-    };
-
     const hour = Math.floor(time);
     const minsLeft = (time - hour) * 60;
     const minute = Math.floor(minsLeft);
     const second = Math.floor((minsLeft - minute) * 60);
 
-    return `${addLeadingZero(hour)}:${addLeadingZero(minute)}:${addLeadingZero(
-      second
-    )}`;
+    const hourString = addLeadingZero(hour.toString(), 2);
+    const minuteString = addLeadingZero(minute.toString(), 2);
+    const secondString = addLeadingZero(second.toString(), 2);
+
+    return `${hourString}:${minuteString}:${secondString}`;
   }
 
   /****************************************************
