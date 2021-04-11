@@ -15,15 +15,15 @@ const marsDate = new MarsDate(spiritRoverLanding);
 
 ```javascript
 marsDate.getLs(); // Returns the Ls (solar longitude) of Mars
-// LS 327.32416829616636
+// 327.32416829616636
 
 marsDate.getMST(); // Returns the Mean Solar Time of Mars (equivalent to Earth's UTC)
-// 13:09:56
+// "13:09:56"
 
 const landingSiteLongitude = 184.702; // Degrees West of Mars Prime Meridien
 marsDate.getLMST(landingSiteLongitude); // Returns Local Mean Solar Time at a specific longitude
-// 00:51:07
+// "00:51:07"
 
 marsDate.getLTST(landingSiteLongitude); // Returns Local True Solar Time at a specific longitude
-// 00:00:01
+// "00:00:01"
 ```
