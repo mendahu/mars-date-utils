@@ -1,6 +1,6 @@
 {
-  "name": "mars-date",
-  "version": "0.0.1",
+  "name": "mars-date-utils",
+  "version": "0.1",
   "description": "JavaScript Library for working with time on Mars",
   "main": "index.js",
   "scripts": {
