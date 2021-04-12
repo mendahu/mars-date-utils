@@ -87,19 +87,33 @@ const cos = (deg: number) => Math.cos((deg * Math.PI) / 180);
 const sin = (deg: number) => Math.sin((deg * Math.PI) / 180);
 
 export class MarsDateBase {
-  protected earthDate: Date;
-  protected ls: number;
-  protected MST: number;
-  protected marsYear: number;
+  protected marsEpoch = MARS_YEAR_EPOCH;
+  protected secondsInSol = MARS_SECONDS_IN_SOL;
+  protected solsInYear = MARS_SOLS_IN_YEAR;
+  protected secondsInYear = MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR;
 
+  protected earthDate: Date;
+
+  // Age Properties
+  protected ageInSeconds: number;
+  protected ageInSols: number;
+  protected ageInYears: number;
+
+  //Properties used to calculate other properties
   private julianDateTT: number;
   private j2000offset: number;
   private marsEOC: number;
   private marsEOT: number;
 
+  // Basic Date properties
+  protected marsYear: number;
+  protected ls: number;
+  protected MST: number;
+
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
-    this.marsYear = this.getMarsYear();
+
+    this.marsYear = this.setMarsYear();
 
     this.julianDateTT = this.getJulianDateTT(); // A-5
     this.j2000offset = this.getJ2000Offset(); // A-6
@@ -109,11 +123,10 @@ export class MarsDateBase {
     this.MST = this.calculateMST(); // C-2
   }
 
-  private getMarsYear() {
+  private setMarsYear() {
     const secondsSinceMarsEpoch =
-      (this.earthDate.getTime() - MARS_YEAR_EPOCH.getTime()) / 1000;
-    const marsYearsSinceMarsEpoch =
-      secondsSinceMarsEpoch / (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR);
+      (this.earthDate.getTime() - this.marsEpoch.getTime()) / 1000;
+    const marsYearsSinceMarsEpoch = secondsSinceMarsEpoch / this.secondsInYear;
     return Math.floor(marsYearsSinceMarsEpoch);
   }
 
