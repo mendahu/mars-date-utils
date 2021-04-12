@@ -7,6 +7,8 @@ For working with time on Mars
 Create a new instance of a MarsDate by passing it an Earth Date.
 
 ```javascript
+import { MarsDate } from "mars-date-utils";
+
 const spiritRoverLanding = new Date(1073190900000);
 // 2004-01-04T04:35:00.000Z
 
