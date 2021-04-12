@@ -60,15 +60,19 @@ export class MarsDate extends MarsDateBase {
   // Age Methods
   *****************************************************/
 
-  public getAgeInYears() {
-    return this.ageInYears;
+  public getAgeInSeconds() {
+    const now = new Date();
+    const nowSeconds = now.getTime();
+    const dateSeconds = this.earthDate.getTime();
+
+    return (nowSeconds - dateSeconds) / 1000;
   }
 
   public getAgeInSols() {
-    return this.ageInSols;
+    return this.getAgeInSeconds() / this.secondsInSol;
   }
 
-  public getAgeInSeconds() {
-    return this.ageInSeconds;
+  public getAgeInYears() {
+    return this.getAgeInSols() / this.solsInYear;
   }
 }
