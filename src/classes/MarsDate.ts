@@ -24,8 +24,13 @@ export class MarsDate extends MarsDateBase {
   }
 
   /****************************************************
-  Public Methods for Fetching Time Data
+  // Basic Methods
   *****************************************************/
+
+  // Mars Calendar Year, with Year 1 beginning April 11 1955 at 00:00:00 UTC
+  public getCalendarYear() {
+    return this.marsYear;
+  }
 
   // Solar Longitude - Location of Mars around the Sun, or roughly the season
   public getLs() {
@@ -37,6 +42,10 @@ export class MarsDate extends MarsDateBase {
     return this.formatTime(this.MST);
   }
 
+  /****************************************************
+  // Longitude-Specific Methods
+  *****************************************************/
+
   // Local Mean Solar Time at a specific longitude
   public getLMST(lon: number) {
     return this.formatTime(this.calculateLMST(lon));
@@ -47,7 +56,19 @@ export class MarsDate extends MarsDateBase {
     return this.formatTime(this.calculateLTST(lon));
   }
 
-  public getYear() {
-    return this.marsYear;
+  /****************************************************
+  // Age Methods
+  *****************************************************/
+
+  public getAgeInYears() {
+    return this.ageInYears;
+  }
+
+  public getAgeInSols() {
+    return this.ageInSols;
+  }
+
+  public getAgeInSeconds() {
+    return this.ageInSeconds;
   }
 }

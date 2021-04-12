@@ -15,10 +15,10 @@ const spiritRoverLanding = new Date(1073190900000);
 const marsDate = new MarsDate(spiritRoverLanding);
 ```
 
-## Basic Methods
+## Basic Time Methods
 
 ```javascript
-marsDate.getYear(); // Returns the Mars Year, with Year 1 beginning April 11 1955 at 00:00:00 UTC
+marsDate.getCalendarYear(); // Returns the Mars Year, with Year 1 beginning April 11 1955 at 00:00:00 UTC
 // 26
 
 marsDate.getLs(); // Returns the Ls (solar longitude)
@@ -28,7 +28,7 @@ marsDate.getMST(); // Returns the Mean Solar Time (equivalent to Earth's UTC)
 // "03:34:38"
 ```
 
-## Longitude-Specific Methods
+## Longitude-Specific Time Methods
 
 ```javascript
 const landingSiteLongitude = 184.527364; // Degrees West of Mars Prime Meridien
@@ -38,4 +38,17 @@ marsDate.getLMST(landingSiteLongitude); // Returns Local Mean Solar Time at a sp
 
 marsDate.getLTST(landingSiteLongitude); // Returns Local True Solar Time at a specific longitude
 // "14:25:25"
+```
+
+## Age Methods
+
+```javascript
+marsDate.getAgeInYears(); //Returns age in Mars Years
+// 9.18334452656409
+
+marsDate.getAgeInSols(); //Returns age in Mars Sols
+// 6139.975885450677
+
+marsDate.getAgeInSeconds(); //Returns age in Seconds
+// 545077857.385
 ```
