@@ -1,5 +1,6 @@
 import { MarsDateBase } from "./MarsDateBase";
 import { addLeadingZero } from "../helpers/index";
+import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
 
 export class MarsDate extends MarsDateBase {
   constructor(earthDate: Date) {
@@ -48,7 +49,7 @@ export class MarsDate extends MarsDateBase {
 
   // Local Mean Solar Time at a specific longitude
   public getLMST(lon: number) {
-    return this.formatTime(this.calculateLMST(lon));
+    return this.formatTime(this.getLocalMeanSolarTime(lon));
   }
 
   // Local True Solar Time at a specific longitude
@@ -69,10 +70,17 @@ export class MarsDate extends MarsDateBase {
   }
 
   public getAgeInSols() {
-    return this.getAgeInSeconds() / this.secondsInSol;
+    return this.getAgeInSeconds() / MARS_SECONDS_IN_SOL;
   }
 
   public getAgeInYears() {
-    return this.getAgeInSols() / this.solsInYear;
+    return this.getAgeInSols() / MARS_SOLS_IN_YEAR;
+  }
+
+  public getSolOfMission() {
+    const offset =
+      (this.millisecondsSinceMarsEpoch / 1000) % MARS_SECONDS_IN_SOL;
+    const age = this.getAgeInSeconds() - offset;
+    return Math.floor(age / MARS_SECONDS_IN_SOL);
   }
 }
