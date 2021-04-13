@@ -30,12 +30,12 @@ export class MarsDate extends MarsDateBase {
 
   // Mars Calendar Year, with Year 1 beginning April 11 1955 at 00:00:00 UTC
   public getCalendarYear() {
-    return this.marsYear;
+    return this.MY;
   }
 
   // Solar Longitude - Location of Mars around the Sun, or roughly the season
   public getLs() {
-    return this.ls;
+    return this.Ls;
   }
 
   // Mean Solar Time at Airy Crater (Lon 0 deg)

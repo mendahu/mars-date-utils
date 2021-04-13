@@ -12,6 +12,7 @@ const nowMarsDate = new MarsDate(now);
 console.log(marsDate);
 console.log(nowMarsDate);
 
+console.log(marsDate.getLMST(184.527364));
 console.log(nowMarsDate.getMST());
 console.log(marsDate.getAgeInSols());
 console.log(marsDate.getSolOfMission());

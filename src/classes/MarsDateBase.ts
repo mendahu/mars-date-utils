@@ -40,15 +40,15 @@ export class MarsDateBase {
   private _marsEquationOfTime: number;
 
   // Basic Date properties
-  protected marsYear: number;
-  protected ls: number;
+  protected MY: number;
+  protected Ls: number;
   protected MST: number;
 
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
     this.millisecondsSinceEpoch = earthDate.getTime(); // A-1
     this.millisecondsSinceMarsEpoch = this.setMilliSecondsSinceMarsEpoch();
-    this.marsYear = this.setMarsYear();
+    this.MY = this.setMarsYear();
     this._julianDateUT = this.getJulianDateUT(); // A-2
     this._j2000offsetUT = this.getJ2000OffsetUT(); // A-3
     this._UTCtoTTConversion = this.getUTCtoTTConversion(); // A-4
@@ -58,7 +58,7 @@ export class MarsDateBase {
     this._marsAngleOfFictionMeanSun = this.getMarsAngleOfFictionMeanSun(); // B-2
     this._perturbers = this.getMarsPerturbers(); // B-3
     this._marsEquationOfCenter = this.getMarsEquationOfCenter(); // B-4
-    this.ls = this.getSolarLongitude(); // B-5
+    this.Ls = this.getSolarLongitude(); // B-5
     this._marsEquationOfTime = this.getMarsEquationOfTime(); // C-1
     this.MST = this.getMeanSolarTime(); // C-2
   }
@@ -110,8 +110,6 @@ export class MarsDateBase {
         mostRecentLeapSecondEpoch =
           leapSecondsArray[leapSecondsArray.length - 1];
       }
-
-      console.log(mostRecentLeapSecondEpoch);
 
       return LEAP_SECONDS[mostRecentLeapSecondEpoch] + TAI_UTC_DIFF;
     } else {
@@ -195,9 +193,9 @@ export class MarsDateBase {
   // Determine Equation of Time
   private getMarsEquationOfTime() {
     return (
-      2.861 * sin(2 * this.ls) -
-      0.071 * sin(4 * this.ls) +
-      0.002 * sin(6 * this.ls) -
+      2.861 * sin(2 * this.Ls) -
+      0.071 * sin(4 * this.Ls) +
+      0.002 * sin(6 * this.Ls) -
       this._marsEquationOfCenter
     );
   }
