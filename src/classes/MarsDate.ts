@@ -1,5 +1,6 @@
 import { MarsDateBase } from "./MarsDateBase";
 import { addLeadingZero } from "../helpers/index";
+import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
 
 export class MarsDate extends MarsDateBase {
   constructor(earthDate: Date) {
@@ -29,12 +30,12 @@ export class MarsDate extends MarsDateBase {
 
   // Mars Calendar Year, with Year 1 beginning April 11 1955 at 00:00:00 UTC
   public getCalendarYear() {
-    return this.marsYear;
+    return this.MY;
   }
 
   // Solar Longitude - Location of Mars around the Sun, or roughly the season
   public getLs() {
-    return this.ls;
+    return this.Ls;
   }
 
   // Mean Solar Time at Airy Crater (Lon 0 deg)
@@ -48,7 +49,7 @@ export class MarsDate extends MarsDateBase {
 
   // Local Mean Solar Time at a specific longitude
   public getLMST(lon: number) {
-    return this.formatTime(this.calculateLMST(lon));
+    return this.formatTime(this.getLocalMeanSolarTime(lon));
   }
 
   // Local True Solar Time at a specific longitude
@@ -69,10 +70,22 @@ export class MarsDate extends MarsDateBase {
   }
 
   public getAgeInSols() {
-    return this.getAgeInSeconds() / this.secondsInSol;
+    const now = new Date();
+    const msd = this.getMarsSolDate(now);
+    return msd - this.marsSolDate;
   }
 
   public getAgeInYears() {
-    return this.getAgeInSols() / this.solsInYear;
+    return this.getAgeInSols() / MARS_SOLS_IN_YEAR;
+  }
+
+  /****************************************************
+  // Special Methods
+  *****************************************************/
+
+  public getSolOfMission(lon: number) {
+    const timeDiff = this.getLocalMeanSolarTime(lon);
+    const adjAge = timeDiff / 24 + this.getAgeInSols();
+    return Math.floor(adjAge);
   }
 }

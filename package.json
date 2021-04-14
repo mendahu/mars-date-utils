@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "scripts": {
     "clear": "rm -rf ./dist",
-    "dev": "nodemon ./dist/index.js --ignore 'dist/**' -e ts --exec \"npm run compile\"",
-    "compile": "npm run clear && tsc && node ./dist/index.js",
+    "dev": "nodemon ./dist/test.js --ignore 'dist/**' -e ts --exec \"npm run compile\"",
+    "compile": "npm run clear && tsc && node ./dist/test.js",
     "build": "tsc",
-    "start": "node ./dist/index.js",
+    "start": "node ./dist/test.js",
     "prepublish": "tsc"
   },
   "repository": {
