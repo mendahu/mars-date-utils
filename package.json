@@ -16,7 +16,7 @@
     "url": "git+https://github.com/mendahu/mars-date.git"
   },
   "author": "Jake Robins",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/mendahu/mars-date/issues"
   },

@@ -1,6 +1,6 @@
 # Mars Date Utilities
 
-For working with time on Mars
+Zero dependency JavaScript library for working with time on Mars.
 
 ## Getting Started
 
