@@ -70,15 +70,18 @@ export class MarsDate extends MarsDateBase {
   }
 
   public getAgeInSols() {
-    return this.getAgeInSeconds() / MARS_SECONDS_IN_SOL;
+    const now = new Date();
+    const msd = this.getMarsSolDate(now);
+    return msd - this.marsSolDate;
   }
 
   public getAgeInYears() {
     return this.getAgeInSols() / MARS_SOLS_IN_YEAR;
   }
 
-  public getSolOfMission() {
-    const now = new Date();
-    return Math.floor(this.getMarsSolDate(now) - this.marsSolDate);
+  public getSolOfMission(lon: number) {
+    const timeDiff = this.getLocalMeanSolarTime(lon);
+    const adjAge = timeDiff / 24 + this.getAgeInSols();
+    return Math.floor(adjAge);
   }
 }
