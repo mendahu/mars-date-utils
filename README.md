@@ -58,3 +58,10 @@ marsDate.getAgeInSols(); //Returns age in Mars Sols
 marsDate.getAgeInSeconds(); //Returns age in Seconds
 // 545077857.385
 ```
+
+## Special Methods
+
+```javascript
+marsDate.getSolOfMission(landingSiteLongitude); // Returns the day number since date at location, assuming date starts on Sol 0 and ticks over at local midnight. Useful for calculating what sol a space mission is on.
+// 6142
+```
