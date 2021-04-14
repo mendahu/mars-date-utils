@@ -78,9 +78,7 @@ export class MarsDate extends MarsDateBase {
   }
 
   public getSolOfMission() {
-    const offset =
-      (this.millisecondsSinceMarsEpoch / 1000) % MARS_SECONDS_IN_SOL;
-    const age = this.getAgeInSeconds() - offset;
-    return Math.floor(age / MARS_SECONDS_IN_SOL);
+    const now = new Date();
+    return Math.floor(this.getMarsSolDate(now) - this.marsSolDate);
   }
 }

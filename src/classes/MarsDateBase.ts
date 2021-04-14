@@ -39,6 +39,8 @@ export class MarsDateBase {
   private _marsEquationOfCenter: number;
   private _marsEquationOfTime: number;
 
+  protected marsSolDate: number;
+
   // Basic Date properties
   protected MY: number;
   protected Ls: number;
@@ -60,6 +62,7 @@ export class MarsDateBase {
     this._marsEquationOfCenter = this.getMarsEquationOfCenter(); // B-4
     this.Ls = this.getSolarLongitude(); // B-5
     this._marsEquationOfTime = this.getMarsEquationOfTime(); // C-1
+    this.marsSolDate = this.getMarsSolDate();
     this.MST = this.getMeanSolarTime(); // C-2
   }
 
@@ -78,15 +81,15 @@ export class MarsDateBase {
   // A-2
   // Convert millis to Julian Date (UT)
   // Offset from a known recent Julian date
-  private getJulianDateUT() {
-    return 2440587.5 + this.millisecondsSinceEpoch / MS_PER_DAY;
+  private getJulianDateUT(millis: number = this.millisecondsSinceEpoch) {
+    return 2440587.5 + millis / MS_PER_DAY;
   }
 
   // A-3
   // Determine time offset form J2000 epoch (UT)
   // Optional data only used in dates prior to Jan 1, 1972 (the first leap second insertion)
-  private getJ2000OffsetUT() {
-    return (this._julianDateUT - 2451545) / DAYS_IN_CENTURY;
+  private getJ2000OffsetUT(JDut: number = this._julianDateUT) {
+    return (JDut - 2451545) / DAYS_IN_CENTURY;
   }
 
   // A-4
@@ -94,12 +97,15 @@ export class MarsDateBase {
   // Terrestrial Time (TT) advances at constant rate, as does UTC,
   // but no leap seconds are inserted into it and so it gradually gets further ahead of UTC.
   // Uses a table for dates after Jan 1, 1972 and formula for dates before
-  private getUTCtoTTConversion() {
+  private getUTCtoTTConversion(
+    millis: number = this.millisecondsSinceEpoch,
+    j2000offsetUT: number = this._j2000offsetUT
+  ) {
     const leapSecondsArray = Object.keys(LEAP_SECONDS);
 
-    if (this.millisecondsSinceEpoch >= 0) {
+    if (millis >= 0) {
       const leapSecondsIndex = leapSecondsArray.findIndex(
-        (ls) => Number(ls) >= this.millisecondsSinceEpoch
+        (ls) => Number(ls) >= millis
       );
 
       let mostRecentLeapSecondEpoch: string;
@@ -115,18 +121,21 @@ export class MarsDateBase {
     } else {
       return (
         64.184 +
-        59 * this._j2000offsetUT -
-        51.2 * Math.pow(this._j2000offsetUT, 2) -
-        67.1 * Math.pow(this._j2000offsetUT, 3) -
-        16.4 * Math.pow(this._j2000offsetUT, 4)
+        59 * j2000offsetUT -
+        51.2 * Math.pow(j2000offsetUT, 2) -
+        67.1 * Math.pow(j2000offsetUT, 3) -
+        16.4 * Math.pow(j2000offsetUT, 4)
       );
     }
   }
 
   // A-5
   // Determine Julian Date (TT)
-  private getJulianDateTT() {
-    return this._julianDateUT + this._UTCtoTTConversion / SECS_PER_DAY;
+  private getJulianDateTT(
+    JDut: number = this._julianDateUT,
+    UTCtoTT: number = this._UTCtoTTConversion
+  ) {
+    return JDut + UTCtoTT / SECS_PER_DAY;
   }
 
   // A-6
@@ -200,12 +209,26 @@ export class MarsDateBase {
     );
   }
 
+  protected getMarsSolDate(earthDate?: Date) {
+    const msd = (JDtt: number) =>
+      (JDtt - 2451549.5) / 1.0274912517 + 44796 - 0.0009626;
+
+    if (!earthDate) {
+      return msd(this._julianDateTT);
+    } else {
+      const millis = earthDate.getTime();
+      const JDut = this.getJulianDateUT(millis);
+      const j2000Ut = this.getJ2000OffsetUT(JDut);
+      const UTCtoTT = this.getUTCtoTTConversion(millis, j2000Ut);
+      const JDtt = this.getJulianDateTT(JDut, UTCtoTT);
+      return msd(JDtt);
+    }
+  }
+
   // C-2
   // Get Mean Solar Time at Mars Prime Meridian aka Airy Mean Time
   private getMeanSolarTime() {
-    const msd =
-      (this._julianDateTT - 2451549.5) / 1.0274912517 + 44796 - 0.0009626;
-    return (24 * msd) % 24;
+    return (24 * this.marsSolDate) % 24;
   }
 
   // C-3
