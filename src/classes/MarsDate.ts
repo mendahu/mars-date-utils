@@ -54,7 +54,7 @@ export class MarsDate extends MarsDateBase {
 
   // Local True Solar Time at a specific longitude
   public getLTST(lon: number) {
-    return this.formatTime(this.calculateLTST(lon));
+    return this.formatTime(this.getLocalTrueSolarTime(lon));
   }
 
   /****************************************************
@@ -88,4 +88,6 @@ export class MarsDate extends MarsDateBase {
     const adjAge = timeDiff / 24 + this.getAgeInSols();
     return Math.floor(adjAge);
   }
+
+  public getAnniversary(n: number) {}
 }
