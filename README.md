@@ -29,7 +29,7 @@ marsDate.getLs(); // Returns the Ls (solar longitude)
 marsDate.getMST(); // Returns the Mean Solar Time (equivalent to Earth's UTC)
 // "03:34:38"
 
-marsDate.getEarthDate() // Return back Earth Date Object
+marsDate.getEarthDate(); // Return back Earth Date Object
 // 2004-01-04T04:35:00.000Z
 ```
 
@@ -64,7 +64,13 @@ marsDate.getAgeInSeconds(); //Returns age in Seconds
 
 ## Special Methods
 
+Other useful methods.
+
 ```javascript
 marsDate.getSolOfMission(landingSiteLongitude); // Returns the day number since date at location, assuming date starts on Sol 0 and ticks over at local midnight. Useful for calculating what sol a space mission is on.
 // 6142
+
+const n = 10;
+marsDate.getAnniversary(n); // Return the nth Mars anniversary from the Mars Date. Returns a regular Date object for use on Earth. Eaxample with n = 10 returns 10 Mars Years since Spirit Landing. Useful for finding your next Mars Birthday. 🎂
+// 2022-10-25T23:43:02.406Z
 ```

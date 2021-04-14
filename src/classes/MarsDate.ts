@@ -89,5 +89,10 @@ export class MarsDate extends MarsDateBase {
     return Math.floor(adjAge);
   }
 
-  public getAnniversary(n: number) {}
+  public getAnniversary(n: number) {
+    const now = new Date();
+    const anniversary =
+      now.getTime() + MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * n * 1000;
+    return new Date(anniversary);
+  }
 }
