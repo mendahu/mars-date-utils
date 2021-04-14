@@ -242,7 +242,7 @@ export class MarsDateBase {
   // C-4
   // Determine Local True Solar Time at specific Longitude on Mars
   // Takes LON in degrees west of prime
-  protected calculateLTST(lon: number) {
+  protected getLocalTrueSolarTime(lon: number) {
     return (
       this.getLocalMeanSolarTime(lon) + this._marsEquationOfTime * (24 / 360)
     );
