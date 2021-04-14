@@ -79,6 +79,10 @@ export class MarsDate extends MarsDateBase {
     return this.getAgeInSols() / MARS_SOLS_IN_YEAR;
   }
 
+  /****************************************************
+  // Special Methods
+  *****************************************************/
+
   public getSolOfMission(lon: number) {
     const timeDiff = this.getLocalMeanSolarTime(lon);
     const adjAge = timeDiff / 24 + this.getAgeInSols();
