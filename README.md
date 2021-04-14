@@ -23,7 +23,7 @@ These methods return the DateTime on Mars for your given Earth DateTime. `mars-d
 marsDate.getCalendarYear(); // 26
 // Returns the Mars Year, with Year 1 beginning April 11 1955 at 00:00:00 UTC
 
-marsDate.getLs(); // 327.66628054834337
+marsDate.getLs(); // 327.66627413425294
 // Returns the Ls (solar longitude)
 
 marsDate.getMST(); // "03:34:38"
@@ -40,10 +40,10 @@ By passing these methods a longitude (degrees west from Prime Meridien), you can
 ```javascript
 const landingSiteLongitude = 184.527364; // Degrees West of Mars Prime Meridien
 
-marsDate.getLMST(landingSiteLongitude); // "15:16:32"
+marsDate.getLMST(landingSiteLongitude); // "15:16:31"
 // Returns Local Mean Solar Time at a specific longitude
 
-marsDate.getLTST(landingSiteLongitude); // "14:25:25"
+marsDate.getLTST(landingSiteLongitude); // "14:25:24"
 // Returns Local True Solar Time at a specific longitude
 ```
 
@@ -52,13 +52,13 @@ marsDate.getLTST(landingSiteLongitude); // "14:25:25"
 These methods calculate age from your Mars DateTime until now.
 
 ```javascript
-marsDate.getAgeInYears(); // 9.18334452656409
+marsDate.getAgeInYears(); // 9.185908911135375
 //Returns age in Mars Years
 
-marsDate.getAgeInSols(); // 6139.975885450677
+marsDate.getAgeInSols(); // 6141.690430655763
 //Returns age in Mars Sols
 
-marsDate.getAgeInSeconds(); // 545077857.385
+marsDate.getAgeInSeconds(); // 545230062.457
 //Returns age in Seconds
 ```
 
@@ -74,7 +74,7 @@ marsDate.getSolOfMission(landingSiteLongitude); // 6142
 
 const n = 1;
 
-marsDate.getAnniversary(n); // 2022-10-25T23:43:02.406Z
+marsDate.getAnniversary(n); // 2005-11-21T04:05:48.240Z
 // Returns the nth Mars anniversary of the Mars Date.
 // Example of n = 1 returns 1 Mars year since Spirit Landing.
 // Returns regular Earth Date object.
