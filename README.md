@@ -28,6 +28,9 @@ marsDate.getLs(); // Returns the Ls (solar longitude)
 
 marsDate.getMST(); // Returns the Mean Solar Time (equivalent to Earth's UTC)
 // "03:34:38"
+
+marsDate.getEarthDate() // Return back Earth Date Object
+// 2004-01-04T04:35:00.000Z
 ```
 
 ## Longitude-Specific Time Methods
