@@ -115,7 +115,7 @@ export class MarsDateBase {
       let mostRecentLeapSecondEpoch: string;
 
       if (leapSecondsIndex > -1) {
-        mostRecentLeapSecondEpoch = leapSecondsArray[leapSecondsIndex - 1];
+        mostRecentLeapSecondEpoch = leapSecondsArray[leapSecondsIndex];
       } else {
         mostRecentLeapSecondEpoch =
           leapSecondsArray[leapSecondsArray.length - 1];
