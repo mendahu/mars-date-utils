@@ -20,6 +20,7 @@ const sin = (deg: number) => Math.sin((deg * Math.PI) / 180);
 export class MarsDateBase {
   protected earthDate: Date;
   protected millisecondsSinceEpoch: number;
+  protected millisecondsSinceLeapSecondEpoch: number;
   protected millisecondsSinceMarsEpoch: number;
 
   // Age Properties
@@ -49,6 +50,9 @@ export class MarsDateBase {
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
     this.millisecondsSinceEpoch = earthDate.getTime(); // A-1
+    this.millisecondsSinceLeapSecondEpoch = new Date(
+      "1972-01-01T00:00:00.000Z"
+    ).getTime(); // A-1
     this.millisecondsSinceMarsEpoch = this.setMilliSecondsSinceMarsEpoch();
     this.MY = this.setMarsYear();
     this._julianDateUT = this.getJulianDateUT(); // A-2
@@ -103,7 +107,7 @@ export class MarsDateBase {
   ) {
     const leapSecondsArray = Object.keys(LEAP_SECONDS);
 
-    if (millis >= 0) {
+    if (millis >= this.millisecondsSinceLeapSecondEpoch) {
       const leapSecondsIndex = leapSecondsArray.findIndex(
         (ls) => Number(ls) >= millis
       );
@@ -111,7 +115,7 @@ export class MarsDateBase {
       let mostRecentLeapSecondEpoch: string;
 
       if (leapSecondsIndex > -1) {
-        mostRecentLeapSecondEpoch = leapSecondsArray[leapSecondsIndex - 1];
+        mostRecentLeapSecondEpoch = leapSecondsArray[leapSecondsIndex];
       } else {
         mostRecentLeapSecondEpoch =
           leapSecondsArray[leapSecondsArray.length - 1];
