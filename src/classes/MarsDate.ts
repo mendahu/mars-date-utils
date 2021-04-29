@@ -80,7 +80,7 @@ export class MarsDate extends MarsDateBase {
   }
 
   /****************************************************
-  // Special Methods
+  // Special Age Methods
   *****************************************************/
 
   public getSolOfMission(lon: number) {
@@ -99,5 +99,14 @@ export class MarsDate extends MarsDateBase {
   public getNextAnniversary(n: number = 1) {
     const age = this.getAgeInYears();
     return this.getAnniversary(Math.ceil(age) + n - 1);
+  }
+
+  /****************************************************
+  // Other Methods
+  *****************************************************/
+
+  public getHeliocentricDistance(options?: { unit: "km" | "au" }) {
+    const multiplier = options?.unit === "km" ? 149597870.7 : 1;
+    return this.heliocentricDistance * multiplier;
   }
 }
