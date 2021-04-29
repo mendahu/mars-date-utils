@@ -62,9 +62,9 @@ marsDate.getAgeInSeconds(); // 545230062.457
 //Returns age in Seconds
 ```
 
-## Special Methods
+## Special Age Methods
 
-Other useful methods.
+Other useful age methods.
 
 ```javascript
 marsDate.getSolOfMission(landingSiteLongitude); // 6142
@@ -84,4 +84,17 @@ marsDate.getNextAnniversary(n); // 2022-10-25T23:43:02.406Z
 // n defaults to 1 but can be incremented to return n anniversaries from now
 // Returns a regular Date object from which you can get the date on Earth
 // Useful for finding your next Mars Birthday. 🎂
+```
+
+## Misc Methods
+
+```javascript
+const options = {
+  unit: "au", // default
+};
+
+marsDate.getHeliocentricDistance(options); // 1.4784561362455526
+// Returns the distance between the centre of Mars and the centre
+// of the Sun on the given Mars Date. Defaults to "AU" as a unit
+// but can optionally be passed "km" for kilometres
 ```

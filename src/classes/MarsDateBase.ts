@@ -27,6 +27,7 @@ export class MarsDateBase {
   protected ageInSeconds: number;
   protected ageInSols: number;
   protected ageInYears: number;
+  protected heliocentricDistance: number;
 
   //Properties used to calculate other properties
   private _julianDateUT: number;
@@ -68,6 +69,7 @@ export class MarsDateBase {
     this._marsEquationOfTime = this.getMarsEquationOfTime(); // C-1
     this.marsSolDate = this.getMarsSolDate();
     this.MST = this.getMeanSolarTime(); // C-2
+    this.heliocentricDistance = this.setHeliocentricDistance(); // D-2
   }
 
   private setMilliSecondsSinceMarsEpoch() {
@@ -249,6 +251,18 @@ export class MarsDateBase {
   protected getLocalTrueSolarTime(lon: number) {
     return (
       this.getLocalMeanSolarTime(lon) + this._marsEquationOfTime * (24 / 360)
+    );
+  }
+
+  private setHeliocentricDistance() {
+    const M = this._marsMeanAnomaly;
+    return (
+      1.52367934 *
+      (1.00436 -
+        0.09309 * cos(M) -
+        0.004336 * cos(2 * M) -
+        0.00031 * cos(3 * M) -
+        0.00003 * cos(4 * M))
     );
   }
 }
