@@ -3,8 +3,8 @@ import { addLeadingZero } from "../helpers/index";
 import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
 
 export class MarsDate extends MarsDateBase {
-  constructor(earthDate: Date) {
-    super(earthDate);
+  constructor(earthDate?: Date) {
+    super(earthDate || new Date());
   }
 
   public getEarthDate() {
