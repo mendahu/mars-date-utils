@@ -106,7 +106,7 @@ export class MarsDate extends MarsDateBase {
   *****************************************************/
 
   public getHeliocentricDistance(options?: { unit: "km" | "au" }) {
-    const multiplier = options?.unit === "km" ? 149597870.7 : 1;
+    const multiplier = options?.unit.toLowerCase() === "km" ? 149597870.7 : 1;
     return this.heliocentricDistance * multiplier;
   }
 }
