@@ -86,7 +86,9 @@ marsDate.getNextAnniversary(n); // 2022-10-25T23:43:02.406Z
 // Useful for finding your next Mars Birthday. 🎂
 ```
 
-## Misc Methods
+## Solar Position Methods
+
+Methods to work with the position of the sun.
 
 ```javascript
 const options = {
@@ -97,4 +99,18 @@ marsDate.getHeliocentricDistance(options); // 1.4784561362455526
 // Returns the distance between the centre of Mars and the centre
 // of the Sun on the given Mars Date. Defaults to "AU" as a unit
 // but can optionally be passed "km" for kilometres
+```
+
+```javascript
+const lat = -14.5684;
+const lon = 184.527364; // Degrees West of Mars Prime Meridien
+
+marsDate.getSolarElevation(lat, lon); // 54.726577500467855
+// Return the elevation of the sun, in degrees, from the horizon (0
+// is at the horizon, 90 is straight up). A negative number indicates
+// the sun is below the horizon (ie. it is night time).
+
+marsDate.getSolarAzimuth(lat, lon); // 267.47987404238927
+// Return the solar azimuth (compass direction of the sun) in degrees
+// clockwise from North. 0 degrees is North, 90 is East, 180 is South and 270 is West
 ```

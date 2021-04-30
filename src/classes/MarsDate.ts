@@ -1,5 +1,5 @@
 import { MarsDateBase } from "./MarsDateBase";
-import { addLeadingZero } from "../helpers/index";
+import { addLeadingZero } from "../helpers";
 import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
 
 /**
@@ -90,7 +90,7 @@ export class MarsDate extends MarsDateBase {
    *
    * This is probably the value you want if you simply want to know the time at a location.
    *
-   * @param {number} lon Longitude
+   * @param {number} lon Longitude in degrees W
    * @returns {string} Mean Solar Time at specified longitude, in format HH:MM:SS
    */
   public getLMST(lon: number) {
@@ -102,7 +102,7 @@ export class MarsDate extends MarsDateBase {
    *
    * If you're just looking for the simple time, recommend using LMST instead.
    *
-   * @param {number} lon Longitude
+   * @param {number} lon Longitude in degrees W
    * @returns {string} True Solar Time at specified longitude, in format HH:MM:SS
    */
   public getLTST(lon: number) {
@@ -196,7 +196,7 @@ export class MarsDate extends MarsDateBase {
   }
 
   /****************************************************
-  // Other Methods
+  // Solar Position Methods
   *****************************************************/
 
   /**
@@ -210,5 +210,32 @@ export class MarsDate extends MarsDateBase {
   public getHeliocentricDistance(options?: { unit: "km" | "au" }) {
     const multiplier = options?.unit.toLowerCase() === "km" ? 149597870.7 : 1;
     return this.heliocentricDistance * multiplier;
+  }
+
+  /**
+   * Gives you the elevation of the sun, measured in degrees from the horizon.
+   * 0 Degrees is at the horizon, 90 degrees is straight up. A negative number
+   * means the sun is below the horizon and not visible (night time).
+   *
+   * @param {number} lon Latitude
+   * @param {number} lat Longitude in degrees W
+   * @returns {number} Degrees of elevation from the horizon
+   */
+  public getSolarElevation(lat: number, lon: number) {
+    const zenithAngle = this.getZenithAngleOfSun(lat, lon);
+    return 90 - zenithAngle;
+  }
+
+  /**
+   * The direction of the sun, with 0 degrees being North, 90 degrees East,
+   * 180 degrees South and 270 degrees West.
+   *
+   * @param {number} lon Latitude
+   * @param {number} lat Longitude in degrees W
+   * @returns {number} Degrees of azimuth from North, clockwise
+   */
+  public getSolarAzimuth(lat: number, lon: number) {
+    const compassAngle = this.getCompassAngleOfSun(lat, lon);
+    return (360 + compassAngle) % 360;
   }
 }
