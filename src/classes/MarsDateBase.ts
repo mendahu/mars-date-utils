@@ -12,13 +12,13 @@ import {
   DAYS_IN_CENTURY,
   SECS_PER_DAY,
   DEGREES_IN_A_CIRCLE,
+  LEAP_SECOND_EPOCH,
 } from "../constants";
 import { cos, sin, tan } from "../helpers/math";
 
 export class MarsDateBase {
   protected earthDate: Date;
   protected millisecondsSinceEpoch: number;
-  protected millisecondsSinceLeapSecondEpoch: number;
   protected millisecondsSinceMarsEpoch: number;
 
   // Age Properties
@@ -54,9 +54,6 @@ export class MarsDateBase {
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
     this.millisecondsSinceEpoch = earthDate.getTime(); // A-1
-    this.millisecondsSinceLeapSecondEpoch = new Date(
-      "1972-01-01T00:00:00.000Z"
-    ).getTime(); // A-1
     this.millisecondsSinceMarsEpoch = this.setMilliSecondsSinceMarsEpoch();
     this.MY = this.setMarsYear();
     this._julianDateUT = this.getJulianDateUT(); // A-2
@@ -80,14 +77,13 @@ export class MarsDateBase {
   }
 
   private setMilliSecondsSinceMarsEpoch() {
-    return this.millisecondsSinceEpoch - MARS_YEAR_EPOCH.getTime();
+    return this.millisecondsSinceEpoch - MARS_YEAR_EPOCH;
   }
 
   // Determine the Mars Year of given date
   private setMarsYear() {
     const marsYearsSinceMarsEpoch =
-      this.millisecondsSinceMarsEpoch /
-      (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * 1000);
+      LEAP_SECOND_EPOCH / (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * 1000);
     return Math.floor(marsYearsSinceMarsEpoch);
   }
 
@@ -116,7 +112,7 @@ export class MarsDateBase {
   ) {
     const leapSecondsArray = Object.keys(LEAP_SECONDS);
 
-    if (millis >= this.millisecondsSinceLeapSecondEpoch) {
+    if (millis >= LEAP_SECOND_EPOCH) {
       const leapSecondsIndex = leapSecondsArray.findIndex(
         (ls) => Number(ls) >= millis
       );

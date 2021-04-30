@@ -81,9 +81,10 @@ export const SECS_PER_DAY = MS_PER_DAY / 1000;
 export const DAYS_IN_CENTURY = 36525;
 
 // Mars time Constants
-export const MARS_YEAR_EPOCH = new Date(-524102400000);
+export const MARS_YEAR_EPOCH = -524102400000;
 export const MARS_SOLS_IN_YEAR = 668.5991;
 export const MARS_SECONDS_IN_SOL = 24 * 60 * 60 + 39 * 60 + 35.244; // 24 hours, 39 minutes, 35.244 seconds
 
 // Other Constants
 export const DEGREES_IN_A_CIRCLE = 360;
+export const LEAP_SECOND_EPOCH = 63072000000; // Jan 1, 1972, 00:00 UTC
