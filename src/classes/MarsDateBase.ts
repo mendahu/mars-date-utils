@@ -40,6 +40,7 @@ export class MarsDateBase {
   private _perturbers: number;
   private _marsEquationOfCenter: number;
   private _marsEquationOfTime: number;
+  private _solarDeclination: number;
 
   protected marsSolDate: number;
 
@@ -69,6 +70,7 @@ export class MarsDateBase {
     this._marsEquationOfTime = this.getMarsEquationOfTime(); // C-1
     this.marsSolDate = this.getMarsSolDate();
     this.MST = this.getMeanSolarTime(); // C-2
+    this._solarDeclination = this.setSolarDeclination(); // D-1
     this.heliocentricDistance = this.setHeliocentricDistance(); // D-2
   }
 
@@ -254,6 +256,15 @@ export class MarsDateBase {
     );
   }
 
+  // D-1
+  // Deterine Planetrographic Solar Declination
+  private setSolarDeclination() {
+    const radians = Math.asin(0.42565 * sin(this.Ls));
+    return (radians * 180) / Math.PI + 0.25 * sin(this.Ls);
+  }
+
+  // D-2
+  // Determine Heliocentric Distance (distance from the sun)
   private setHeliocentricDistance() {
     const M = this._marsMeanAnomaly;
     return (
