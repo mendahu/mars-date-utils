@@ -90,7 +90,7 @@ export class MarsDate extends MarsDateBase {
    *
    * This is probably the value you want if you simply want to know the time at a location.
    *
-   * @param {number} lon Longitude
+   * @param {number} lon Longitude in degrees W
    * @returns {string} Mean Solar Time at specified longitude, in format HH:MM:SS
    */
   public getLMST(lon: number) {
@@ -102,7 +102,7 @@ export class MarsDate extends MarsDateBase {
    *
    * If you're just looking for the simple time, recommend using LMST instead.
    *
-   * @param {number} lon Longitude
+   * @param {number} lon Longitude in degrees W
    * @returns {string} True Solar Time at specified longitude, in format HH:MM:SS
    */
   public getLTST(lon: number) {
@@ -218,7 +218,7 @@ export class MarsDate extends MarsDateBase {
    * means the sun is below the horizon and not visible (night time)
    *
    * @param {number} lon Latitude
-   * @param {number} lat Longitude
+   * @param {number} lat Longitude in degrees W
    * @returns {number} Degrees of elevation from the horizon
    */
   public getSolarElevation(lat: number, lon: number) {
@@ -230,7 +230,7 @@ export class MarsDate extends MarsDateBase {
    * 180 degrees South and 270 degrees West.
    *
    * @param {number} lon Latitude
-   * @param {number} lat Longitude
+   * @param {number} lat Longitude in degrees W
    * @returns {number} Degrees of azimuth from North, clockwise
    */
   public getSolarAzimuth(lat: number, lon: number) {
