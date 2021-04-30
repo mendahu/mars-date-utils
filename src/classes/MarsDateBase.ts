@@ -38,8 +38,6 @@ export class MarsDateBase {
   private _perturbers: number;
   private _marsEquationOfCenter: number;
   private _marsEquationOfTime: number;
-  private _heliocentricLongitude: number;
-  private _heliocentricLatitude: number;
   private _solarDeclination: number;
   private _subsolarLongitude: number;
 
@@ -72,8 +70,6 @@ export class MarsDateBase {
     this._subsolarLongitude = this.setSubsolarLongitude(); // C-5
     this._solarDeclination = this.setSolarDeclination(); // D-1
     this.heliocentricDistance = this.setHeliocentricDistance(); // D-2
-    this._heliocentricLongitude = this.setHeliocentricLongitude(); // D-3
-    this._heliocentricLatitude = this.setHeliocentricLatitude(); // D-4
   }
 
   private setMilliSecondsSinceMarsEpoch() {
@@ -281,27 +277,6 @@ export class MarsDateBase {
         0.004336 * cos(2 * M) -
         0.00031 * cos(3 * M) -
         0.00003 * cos(4 * M))
-    );
-  }
-
-  // D-3
-  // Determine heliocentric longitude
-  private setHeliocentricLongitude() {
-    const lon =
-      this.Ls +
-      85.061 -
-      0.015 * sin(71 + 2 * this.Ls) -
-      5.5e-6 * this._j2000offsetTT;
-
-    return lon % 360;
-  }
-
-  // D-4
-  // Determine heliocentric latitude
-  private setHeliocentricLatitude() {
-    return (
-      -(1.8497 - 2.23e-5 * this._j2000offsetTT) *
-      sin(this.Ls - 144.5 + 2.57e-6 * this._j2000offsetTT)
     );
   }
 
