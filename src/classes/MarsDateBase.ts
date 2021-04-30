@@ -38,8 +38,11 @@ export class MarsDateBase {
   private _perturbers: number;
   private _marsEquationOfCenter: number;
   private _marsEquationOfTime: number;
+  private _heliocentricLongitude: number;
+  private _heliocentricLatitude: number;
   private _solarDeclination: number;
   private _subsolarLongitude: number;
+  private _earthHeliocentricLongitude: number;
 
   // Basic Date properties
   protected MY: number;
@@ -70,6 +73,8 @@ export class MarsDateBase {
     this._subsolarLongitude = this.setSubsolarLongitude(); // C-5
     this._solarDeclination = this.setSolarDeclination(); // D-1
     this.heliocentricDistance = this.setHeliocentricDistance(); // D-2
+    this._heliocentricLongitude = this.setHeliocentricLongitude(); // D-3
+    this._heliocentricLatitude = this.setHeliocentricLatitude(); // D-4
   }
 
   private setMilliSecondsSinceMarsEpoch() {
@@ -281,6 +286,27 @@ export class MarsDateBase {
     );
   }
 
+  // D-3
+  // Determine heliocentric longitude
+  private setHeliocentricLongitude() {
+    const lon =
+      this.Ls +
+      85.061 -
+      0.015 * sin(71 + 2 * this.Ls) -
+      5.5e-6 * this._j2000offsetTT;
+
+    return lon % 360;
+  }
+
+  // D-4
+  // Determine heliocentric latitude
+  private setHeliocentricLatitude() {
+    return (
+      -(1.8497 - 2.23e-5 * this._j2000offsetTT) *
+      sin(this.Ls - 144.5 + 2.57e-6 * this._j2000offsetTT)
+    );
+  }
+
   // D-5
   // Determine Zenith Angle of the Sun
   protected getZenithAngleOfSun(lat: number, lon: number) {
@@ -300,5 +326,14 @@ export class MarsDateBase {
       sin(hourAngle),
       cos(lat) * tan(this._solarDeclination) - sin(lat) * cos(hourAngle)
     );
+  }
+
+  private setEarthHeliocentricLongitude() {
+    const earthOrbitEpoch = new Date("1996-08-25T00:00:00.000Z");
+    const elapsedMillis =
+      this.millisecondsSinceEpoch - earthOrbitEpoch.getTime();
+    const elapsedDays = elapsedMillis / 1000 / 60 / 60 / 24;
+
+    return (0.9855931 * elapsedDays + 333.586) % 360;
   }
 }
