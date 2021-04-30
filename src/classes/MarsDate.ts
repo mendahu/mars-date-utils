@@ -1,5 +1,5 @@
 import { MarsDateBase } from "./MarsDateBase";
-import { addLeadingZero } from "../helpers/index";
+import { addLeadingZero } from "../helpers";
 import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
 
 /**
@@ -222,7 +222,8 @@ export class MarsDate extends MarsDateBase {
    * @returns {number} Degrees of elevation from the horizon
    */
   public getSolarElevation(lat: number, lon: number) {
-    return 90 - (this.getZenithAngleOfSun(lat, lon) * 180) / Math.PI;
+    const zenithAngle = this.getZenithAngleOfSun(lat, lon);
+    return 90 - zenithAngle;
   }
 
   /**
@@ -234,7 +235,7 @@ export class MarsDate extends MarsDateBase {
    * @returns {number} Degrees of azimuth from North, clockwise
    */
   public getSolarAzimuth(lat: number, lon: number) {
-    const compassAngle = this.getCompassAngleOfSun(lat, lon) * (180 / Math.PI);
+    const compassAngle = this.getCompassAngleOfSun(lat, lon);
     return (360 + compassAngle) % 360;
   }
 }

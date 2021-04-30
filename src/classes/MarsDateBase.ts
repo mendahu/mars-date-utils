@@ -14,7 +14,7 @@ import {
   DEGREES_IN_A_CIRCLE,
   LEAP_SECOND_EPOCH,
 } from "../constants";
-import { cos, sin, tan } from "../helpers";
+import { cos, sin, tan, acos, atan2 } from "../helpers";
 
 export class MarsDateBase {
   protected earthDate: Date;
@@ -284,7 +284,7 @@ export class MarsDateBase {
   // D-5
   // Determine Zenith Angle of the Sun
   protected getZenithAngleOfSun(lat: number, lon: number) {
-    return Math.acos(
+    return acos(
       sin(this._solarDeclination) * sin(lat) +
         cos(this._solarDeclination) *
           cos(lat) *
@@ -296,7 +296,7 @@ export class MarsDateBase {
   // Determine Compass Angle
   protected getCompassAngleOfSun(lat: number, lon: number) {
     const hourAngle = lon - this._subsolarLongitude;
-    return Math.atan2(
+    return atan2(
       sin(hourAngle),
       cos(lat) * tan(this._solarDeclination) - sin(lat) * cos(hourAngle)
     );
