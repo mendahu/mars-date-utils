@@ -77,13 +77,13 @@ export const TAI_UTC_DIFF = 32.184;
 
 // Earth Time Constants
 export const MS_PER_DAY = 8.64e7;
-export const SECS_PER_DAY = MS_PER_DAY / 1000;
+export const SECS_PER_DAY = 8.64e4;
 export const DAYS_IN_CENTURY = 36525;
 
 // Mars time Constants
-export const MARS_YEAR_EPOCH = -524102400000;
+export const MARS_YEAR_EPOCH = -524102400000; // April 1, 1955, 00:00 UTC
 export const MARS_SOLS_IN_YEAR = 668.5991;
-export const MARS_SECONDS_IN_SOL = 24 * 60 * 60 + 39 * 60 + 35.244; // 24 hours, 39 minutes, 35.244 seconds
+export const MARS_SECONDS_IN_SOL = 88775.244; // 24 hours, 39 minutes, 35.244 seconds
 
 // Other Constants
 export const DEGREES_IN_A_CIRCLE = 360;

@@ -14,7 +14,7 @@ import {
   DEGREES_IN_A_CIRCLE,
   LEAP_SECOND_EPOCH,
 } from "../constants";
-import { cos, sin, tan } from "../helpers/math";
+import { cos, sin, tan } from "../helpers";
 
 export class MarsDateBase {
   protected earthDate: Date;
@@ -79,7 +79,8 @@ export class MarsDateBase {
   // Determine the Mars Year of given date
   private setMarsYear() {
     const marsYearsSinceMarsEpoch =
-      LEAP_SECOND_EPOCH / (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * 1000);
+      this.millisecondsSinceMarsEpoch /
+      (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * 1000);
     return Math.floor(marsYearsSinceMarsEpoch);
   }
 
