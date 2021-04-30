@@ -13,9 +13,7 @@ import {
   SECS_PER_DAY,
   DEGREES_IN_A_CIRCLE,
 } from "../constants";
-
-const cos = (deg: number) => Math.cos((deg * Math.PI) / 180);
-const sin = (deg: number) => Math.sin((deg * Math.PI) / 180);
+import { cos, sin, tan } from "../helpers/math";
 
 export class MarsDateBase {
   protected earthDate: Date;
@@ -27,7 +25,7 @@ export class MarsDateBase {
   protected ageInSeconds: number;
   protected ageInSols: number;
   protected ageInYears: number;
-  protected heliocentricDistance: number;
+  protected marsSolDate: number;
 
   //Properties used to calculate other properties
   private _julianDateUT: number;
@@ -40,14 +38,18 @@ export class MarsDateBase {
   private _perturbers: number;
   private _marsEquationOfCenter: number;
   private _marsEquationOfTime: number;
+  private _heliocentricLongitude: number;
+  private _heliocentricLatitude: number;
   private _solarDeclination: number;
-
-  protected marsSolDate: number;
+  private _subsolarLongitude: number;
 
   // Basic Date properties
   protected MY: number;
   protected Ls: number;
   protected MST: number;
+
+  // Advanced Date Properties
+  protected heliocentricDistance: number;
 
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
@@ -70,8 +72,11 @@ export class MarsDateBase {
     this._marsEquationOfTime = this.getMarsEquationOfTime(); // C-1
     this.marsSolDate = this.getMarsSolDate();
     this.MST = this.getMeanSolarTime(); // C-2
+    this._subsolarLongitude = this.setSubsolarLongitude(); // C-5
     this._solarDeclination = this.setSolarDeclination(); // D-1
     this.heliocentricDistance = this.setHeliocentricDistance(); // D-2
+    this._heliocentricLongitude = this.setHeliocentricLongitude(); // D-3
+    this._heliocentricLatitude = this.setHeliocentricLatitude(); // D-4
   }
 
   private setMilliSecondsSinceMarsEpoch() {
@@ -256,6 +261,12 @@ export class MarsDateBase {
     );
   }
 
+  // C-5
+  // Determine subsolar longitude
+  private setSubsolarLongitude() {
+    return (this.MST * 15 + this._marsEquationOfTime + 180) % 360;
+  }
+
   // D-1
   // Deterine Planetrographic Solar Declination
   private setSolarDeclination() {
@@ -274,6 +285,48 @@ export class MarsDateBase {
         0.004336 * cos(2 * M) -
         0.00031 * cos(3 * M) -
         0.00003 * cos(4 * M))
+    );
+  }
+
+  // D-3
+  // Determine heliocentric longitude
+  private setHeliocentricLongitude() {
+    const lon =
+      this.Ls +
+      85.061 -
+      0.015 * sin(71 + 2 * this.Ls) -
+      5.5e-6 * this._j2000offsetTT;
+
+    return lon % 360;
+  }
+
+  // D-4
+  // Determine heliocentric latitude
+  private setHeliocentricLatitude() {
+    return (
+      -(1.8497 - 2.23e-5 * this._j2000offsetTT) *
+      sin(this.Ls - 144.5 + 2.57e-6 * this._j2000offsetTT)
+    );
+  }
+
+  // D-5
+  // Determine Zenith Angle of the Sun
+  protected getZenithAngleOfSun(lat: number, lon: number) {
+    return Math.acos(
+      sin(this._solarDeclination) * sin(lat) +
+        cos(this._solarDeclination) *
+          cos(lat) *
+          cos(lon - this._subsolarLongitude)
+    );
+  }
+
+  // D-6
+  // Determine Compass Angle
+  protected getCompassAngleOfSun(lat: number, lon: number) {
+    return Math.atan(
+      sin(lon - this._subsolarLongitude) /
+        (cos(lat) * tan(this._solarDeclination) -
+          sin(lat) * cos(lon - this._subsolarLongitude))
     );
   }
 }

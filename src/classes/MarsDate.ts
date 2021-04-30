@@ -1,6 +1,7 @@
 import { MarsDateBase } from "./MarsDateBase";
 import { addLeadingZero } from "../helpers/index";
 import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
+import { cos, sin, tan } from "../helpers/math";
 
 /**
  * Class representing a Mars Date
@@ -210,5 +211,30 @@ export class MarsDate extends MarsDateBase {
   public getHeliocentricDistance(options?: { unit: "km" | "au" }) {
     const multiplier = options?.unit.toLowerCase() === "km" ? 149597870.7 : 1;
     return this.heliocentricDistance * multiplier;
+  }
+
+  /**
+   * Gives you the elevation of the sun, measured in degrees from the horizon
+   * 0 Degrees is at the horizon, 90 degrees is straight up. A negative number
+   * means the sun is below the horizon and not visible (night time)
+   *
+   * @param {number} lon Latitude
+   * @param {number} lat Longitude
+   * @returns {number} Degrees of elevation from the horizon
+   */
+  public getSolarElevation(lat: number, lon: number) {
+    return 90 - (this.getZenithAngleOfSun(lat, lon) * 180) / Math.PI;
+  }
+
+  /**
+   * The direction of the sun, with 0 degrees being North, 90 degrees East,
+   * 180 degrees South and 270 degrees West.
+   *
+   * @param {number} lon Latitude
+   * @param {number} lat Longitude
+   * @returns {number} Degrees of azimuth from North, clockwise
+   */
+  public getSolarAzimuth(lat: number, lon: number) {
+    return this.getCompassAngleOfSun(lat, lon) * (180 / Math.PI) + 180;
   }
 }
