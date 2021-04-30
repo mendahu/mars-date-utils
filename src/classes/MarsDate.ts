@@ -1,5 +1,5 @@
 import { MarsDateBase } from "./MarsDateBase";
-import { addLeadingZero } from "../helpers";
+import { formatTime } from "../helpers";
 import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
 
 /**
@@ -19,28 +19,6 @@ export class MarsDate extends MarsDateBase {
    */
   constructor(earthDate?: Date) {
     super(earthDate || new Date());
-  }
-
-  /**
-   *
-   * @param {number} time
-   * @returns {string} A formatted string of time, HH:MM:SS
-   *
-   * @example
-   *
-   * "09:33:45"
-   */
-  private formatTime(time: number) {
-    const hour = Math.floor(time);
-    const minsLeft = (time - hour) * 60;
-    const minute = Math.floor(minsLeft);
-    const second = Math.floor((minsLeft - minute) * 60);
-
-    const hourString = addLeadingZero(hour.toString(), 2);
-    const minuteString = addLeadingZero(minute.toString(), 2);
-    const secondString = addLeadingZero(second.toString(), 2);
-
-    return `${hourString}:${minuteString}:${secondString}`;
   }
 
   /**
@@ -78,7 +56,7 @@ export class MarsDate extends MarsDateBase {
    * @returns {string} Mean Solar Time at Longitude 0, in format HH:MM:SS
    */
   public getMST() {
-    return this.formatTime(this.MST);
+    return formatTime(this.MST);
   }
 
   /****************************************************
@@ -94,7 +72,7 @@ export class MarsDate extends MarsDateBase {
    * @returns {string} Mean Solar Time at specified longitude, in format HH:MM:SS
    */
   public getLMST(lon: number) {
-    return this.formatTime(this.getLocalMeanSolarTime(lon));
+    return formatTime(this.getLocalMeanSolarTime(lon));
   }
 
   /**
@@ -106,7 +84,7 @@ export class MarsDate extends MarsDateBase {
    * @returns {string} True Solar Time at specified longitude, in format HH:MM:SS
    */
   public getLTST(lon: number) {
-    return this.formatTime(this.getLocalTrueSolarTime(lon));
+    return formatTime(this.getLocalTrueSolarTime(lon));
   }
 
   /****************************************************
