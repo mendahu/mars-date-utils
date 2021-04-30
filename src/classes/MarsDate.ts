@@ -1,7 +1,6 @@
 import { MarsDateBase } from "./MarsDateBase";
 import { addLeadingZero } from "../helpers/index";
 import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
-import { cos, sin, tan } from "../helpers/math";
 
 /**
  * Class representing a Mars Date
@@ -235,6 +234,7 @@ export class MarsDate extends MarsDateBase {
    * @returns {number} Degrees of azimuth from North, clockwise
    */
   public getSolarAzimuth(lat: number, lon: number) {
-    return this.getCompassAngleOfSun(lat, lon) * (180 / Math.PI) + 180;
+    const arctan = this.getCompassAngleOfSun(lat, lon) * (180 / Math.PI);
+    return (360 + arctan) % 360;
   }
 }

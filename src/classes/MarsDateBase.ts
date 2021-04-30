@@ -323,10 +323,10 @@ export class MarsDateBase {
   // D-6
   // Determine Compass Angle
   protected getCompassAngleOfSun(lat: number, lon: number) {
-    return Math.atan(
-      sin(lon - this._subsolarLongitude) /
-        (cos(lat) * tan(this._solarDeclination) -
-          sin(lat) * cos(lon - this._subsolarLongitude))
+    const hourAngle = lon - this._subsolarLongitude;
+    return Math.atan2(
+      sin(hourAngle),
+      cos(lat) * tan(this._solarDeclination) - sin(lat) * cos(hourAngle)
     );
   }
 }
