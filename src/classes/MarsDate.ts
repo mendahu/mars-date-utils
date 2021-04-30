@@ -196,7 +196,7 @@ export class MarsDate extends MarsDateBase {
   }
 
   /****************************************************
-  // Other Methods
+  // Solar Position Methods
   *****************************************************/
 
   /**
@@ -213,9 +213,9 @@ export class MarsDate extends MarsDateBase {
   }
 
   /**
-   * Gives you the elevation of the sun, measured in degrees from the horizon
+   * Gives you the elevation of the sun, measured in degrees from the horizon.
    * 0 Degrees is at the horizon, 90 degrees is straight up. A negative number
-   * means the sun is below the horizon and not visible (night time)
+   * means the sun is below the horizon and not visible (night time).
    *
    * @param {number} lon Latitude
    * @param {number} lat Longitude in degrees W
@@ -234,7 +234,7 @@ export class MarsDate extends MarsDateBase {
    * @returns {number} Degrees of azimuth from North, clockwise
    */
   public getSolarAzimuth(lat: number, lon: number) {
-    const arctan = this.getCompassAngleOfSun(lat, lon) * (180 / Math.PI);
-    return (360 + arctan) % 360;
+    const compassAngle = this.getCompassAngleOfSun(lat, lon) * (180 / Math.PI);
+    return (360 + compassAngle) % 360;
   }
 }
