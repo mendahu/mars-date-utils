@@ -51,7 +51,6 @@ export class MarsDateBase {
   private _marsEquationOfCenter: number;
   private _marsEquationOfTime: number;
   private _heliocentricLongitude: number;
-  private _heliocentricLatitude: number;
   private _solarDeclination: number;
   private _subsolarLongitude: number;
 
@@ -91,7 +90,6 @@ export class MarsDateBase {
     this._solarDeclination = this.setSolarDeclination(); // D-1
     this.heliocentricDistance = this.setHeliocentricDistance(); // D-2
     this._heliocentricLongitude = this.setHeliocentricLongitude(); // D-3
-    this._heliocentricLatitude = this.setHeliocentricLatitude(); // D-4
     this._earthHeliocentricLongitude = this.setEarthHeliocentricLongitude();
     this.earthHeliocentricDistance = this.setEarthHeliocentricDistance();
     this.earthMarsDistance = this.setEarthMarsDistance();
@@ -319,15 +317,6 @@ export class MarsDateBase {
     return lon % 360;
   }
 
-  // D-4
-  // Determine heliocentric latitude
-  private setHeliocentricLatitude() {
-    return (
-      -(1.8497 - 2.23e-5 * this._j2000offsetTT) *
-      sin(this.Ls - 144.5 + 2.57e-6 * this._j2000offsetTT)
-    );
-  }
-
   // D-5
   // Determine Zenith Angle of the Sun
   protected getZenithAngleOfSun(lat: number, lon: number) {
@@ -379,6 +368,7 @@ export class MarsDateBase {
     const trueAnomaly =
       (daysSincePerihelion / DAYS_IN_YEAR) * DEGREES_IN_A_CIRCLE;
 
+    // http://curious.astro.cornell.edu/our-solar-system/41-our-solar-system/the-earth/orbit/80-how-can-i-find-the-distance-to-the-sun-on-any-given-day-advanced
     return (
       (EARTH_SEMI_MAJOR_AXIS * (1 - EARTH_ECCENTRICITY * EARTH_ECCENTRICITY)) /
       (1 + EARTH_ECCENTRICITY * cos(trueAnomaly))
