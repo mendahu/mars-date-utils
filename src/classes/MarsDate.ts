@@ -1,6 +1,10 @@
 import { MarsDateBase } from "./MarsDateBase";
 import { formatTime } from "../helpers";
-import { MARS_SECONDS_IN_SOL, MARS_SOLS_IN_YEAR } from "../constants";
+import {
+  ASTRONOMICAL_UNIT,
+  MARS_SECONDS_IN_SOL,
+  MARS_SOLS_IN_YEAR,
+} from "../constants";
 
 /**
  * Class representing a Mars Date
@@ -186,7 +190,8 @@ export class MarsDate extends MarsDateBase {
    * @returns {number} Distance from the Sun
    */
   public getHeliocentricDistance(options?: { unit: "km" | "au" }) {
-    const multiplier = options?.unit.toLowerCase() === "km" ? 149597870.7 : 1;
+    const multiplier =
+      options?.unit.toLowerCase() === "km" ? ASTRONOMICAL_UNIT : 1;
     return this.heliocentricDistance * multiplier;
   }
 
@@ -215,5 +220,31 @@ export class MarsDate extends MarsDateBase {
   public getSolarAzimuth(lat: number, lon: number) {
     const compassAngle = this.getCompassAngleOfSun(lat, lon);
     return (360 + compassAngle) % 360;
+  }
+
+  /****************************************************
+  // Earth / Mars Relationship Methods
+  *****************************************************/
+
+  /**
+   * Mars orbit is elliptical, and so its distance from the Sun varies through the year.
+   *
+   * Can return the value in Astronominal Units (AU where 1 AU === the average distance between the Sun and Earth) or kilometres.
+   *
+   * @param {{ unit: "km" | "au "}=} options Optional units
+   * @returns {number} Distance from the Sun
+   */
+  public getDistanceBetweenEarthAndMars(options?: { unit: "km" | "au" }) {
+    const multiplier =
+      options?.unit.toLowerCase() === "km" ? ASTRONOMICAL_UNIT : 1;
+    return this.earthMarsDistance * multiplier;
+  }
+
+  /**
+   *
+   * @returns Time it takes for light to travel between the Earth and Mars (seconds)
+   */
+  public getLightDelay() {
+    return this.lightDelay;
   }
 }

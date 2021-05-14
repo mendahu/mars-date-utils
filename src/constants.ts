@@ -78,13 +78,23 @@ export const TAI_UTC_DIFF = 32.184;
 // Earth Time Constants
 export const MS_PER_DAY = 8.64e7;
 export const SECS_PER_DAY = 8.64e4;
+export const DAYS_IN_YEAR = 365.25;
 export const DAYS_IN_CENTURY = 36525;
+
+// Earth Orbital Data
+export const EARTH_SEMI_MAJOR_AXIS = 1.00000011; // AU
+export const EARTH_ECCENTRICITY = 0.01671022;
 
 // Mars time Constants
 export const MARS_YEAR_EPOCH = -524102400000; // April 1, 1955, 00:00 UTC
 export const MARS_SOLS_IN_YEAR = 668.5991;
 export const MARS_SECONDS_IN_SOL = 88775.244; // 24 hours, 39 minutes, 35.244 seconds
 
+// Mars Orbital Data
+export const MARS_SEMI_MAJOR_AXIS = 1.52367934; // AU
+
 // Other Constants
 export const DEGREES_IN_A_CIRCLE = 360;
 export const LEAP_SECOND_EPOCH = 63072000000; // Jan 1, 1972, 00:00 UTC
+export const ASTRONOMICAL_UNIT = 149597870.7; // kilometres in one AU
+export const SPEED_OF_LIGHT = 299792458; // metres per second
