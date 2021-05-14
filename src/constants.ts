@@ -78,6 +78,7 @@ export const TAI_UTC_DIFF = 32.184;
 // Earth Time Constants
 export const MS_PER_DAY = 8.64e7;
 export const SECS_PER_DAY = 8.64e4;
+export const HOURS_IN_A_DAY = 24;
 export const DAYS_IN_YEAR = 365.25;
 export const DAYS_IN_CENTURY = 36525;
 
@@ -95,6 +96,7 @@ export const MARS_SECONDS_IN_SOL = 88775.244; // 24 hours, 39 minutes, 35.244 se
 export const MARS_SEMI_MAJOR_AXIS = 1.52367934; // AU
 
 // Other Constants
+export const MILLIS_IN_A_SEC = 1000;
 export const DEGREES_IN_A_CIRCLE = 360;
 export const LEAP_SECOND_EPOCH = 63072000000; // Jan 1, 1972, 00:00 UTC
 export const ASTRONOMICAL_UNIT = 149597870.7; // kilometres in one AU

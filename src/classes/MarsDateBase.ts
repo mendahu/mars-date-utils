@@ -25,6 +25,8 @@ import {
   MARS_SEMI_MAJOR_AXIS,
   SPEED_OF_LIGHT,
   ASTRONOMICAL_UNIT,
+  MILLIS_IN_A_SEC,
+  HOURS_IN_A_DAY,
 } from "../constants";
 import { cos, sin, tan, acos, atan2, getDaysBetween } from "../helpers";
 
@@ -104,7 +106,7 @@ export class MarsDateBase {
   private setMarsYear() {
     const marsYearsSinceMarsEpoch =
       this.millisecondsSinceMarsEpoch /
-      (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * 1000);
+      (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * MILLIS_IN_A_SEC);
     return Math.floor(marsYearsSinceMarsEpoch);
   }
 
@@ -258,15 +260,16 @@ export class MarsDateBase {
   // C-2
   // Get Mean Solar Time at Mars Prime Meridian aka Airy Mean Time
   private getMeanSolarTime() {
-    return (24 * this.marsSolDate) % 24;
+    return (HOURS_IN_A_DAY * this.marsSolDate) % HOURS_IN_A_DAY;
   }
 
   // C-3
   // Determine Local Mean Solar Time at specific Longitude on Mars
   // Takes LON in degrees west of prime
   protected getLocalMeanSolarTime(lon: number) {
-    const time = this.getMeanSolarTime() - (lon * 24) / 360;
-    return (time + 24) % 24;
+    const time =
+      this.getMeanSolarTime() - (lon * HOURS_IN_A_DAY) / DEGREES_IN_A_CIRCLE;
+    return (time + HOURS_IN_A_DAY) % HOURS_IN_A_DAY;
   }
 
   // C-4
@@ -274,14 +277,17 @@ export class MarsDateBase {
   // Takes LON in degrees west of prime
   protected getLocalTrueSolarTime(lon: number) {
     return (
-      this.getLocalMeanSolarTime(lon) + this._marsEquationOfTime * (24 / 360)
+      this.getLocalMeanSolarTime(lon) +
+      this._marsEquationOfTime * (HOURS_IN_A_DAY / DEGREES_IN_A_CIRCLE)
     );
   }
 
   // C-5
   // Determine subsolar longitude
   private setSubsolarLongitude() {
-    return (this.MST * 15 + this._marsEquationOfTime + 180) % 360;
+    return (
+      (this.MST * 15 + this._marsEquationOfTime + 180) % DEGREES_IN_A_CIRCLE
+    );
   }
 
   // D-1
@@ -314,7 +320,7 @@ export class MarsDateBase {
       0.015 * sin(71 + 2 * this.Ls) -
       5.5e-6 * this._j2000offsetTT;
 
-    return lon % 360;
+    return lon % DEGREES_IN_A_CIRCLE;
   }
 
   // D-5
@@ -350,7 +356,7 @@ export class MarsDateBase {
     const elapsedDays = getDaysBetween(this.earthDate, EPHEMERIS);
 
     return (
-      360 +
+      DEGREES_IN_A_CIRCLE +
       ((DAILY_MOTION_IN_DEGREES * elapsedDays + LON_AT_EPOCH) %
         DEGREES_IN_A_CIRCLE)
     );
@@ -383,7 +389,7 @@ export class MarsDateBase {
     lons.sort((a, b) => b - a);
 
     let angle = lons[0] - lons[1];
-    angle = angle > 180 ? 360 - angle : angle;
+    angle = angle > 180 ? DEGREES_IN_A_CIRCLE - angle : angle;
 
     // find distance between Earth and Mars using law of cosines.
     // Assumes no orbital inclination of either planet for simplicity.
@@ -399,6 +405,9 @@ export class MarsDateBase {
 
   // Returns number of seconds it takes to cross distance of Earth and Mars at speed of light
   private setLightDelay() {
-    return (this.earthMarsDistance * ASTRONOMICAL_UNIT * 1000) / SPEED_OF_LIGHT;
+    return (
+      (this.earthMarsDistance * ASTRONOMICAL_UNIT * MILLIS_IN_A_SEC) /
+      SPEED_OF_LIGHT
+    );
   }
 }

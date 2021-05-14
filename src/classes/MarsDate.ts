@@ -2,8 +2,11 @@ import { MarsDateBase } from "./MarsDateBase";
 import { formatTime } from "../helpers";
 import {
   ASTRONOMICAL_UNIT,
+  DEGREES_IN_A_CIRCLE,
+  HOURS_IN_A_DAY,
   MARS_SECONDS_IN_SOL,
   MARS_SOLS_IN_YEAR,
+  MILLIS_IN_A_SEC,
 } from "../constants";
 
 /**
@@ -99,11 +102,8 @@ export class MarsDate extends MarsDateBase {
    * @returns {number} Amount of seconds between the Mars Date and now. A negative value would indicate a Mars Date in the future.
    */
   public getAgeInSeconds() {
-    const now = new Date();
-    const nowSeconds = now.getTime();
-    const dateSeconds = this.earthDate.getTime();
-
-    return (nowSeconds - dateSeconds) / 1000;
+    const millis = new Date().getTime();
+    return (millis - this.millisecondsSinceEpoch) / MILLIS_IN_A_SEC;
   }
 
   /**
@@ -134,7 +134,7 @@ export class MarsDate extends MarsDateBase {
    */
   public getSolOfMission(lon: number) {
     const timeDiff = this.getLocalMeanSolarTime(lon);
-    const adjAge = timeDiff / 24 + this.getAgeInSols();
+    const adjAge = timeDiff / HOURS_IN_A_DAY + this.getAgeInSols();
     return Math.floor(adjAge);
   }
 
@@ -153,7 +153,7 @@ export class MarsDate extends MarsDateBase {
   public getAnniversary(n: number) {
     const anniversary =
       this.millisecondsSinceEpoch +
-      MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * n * 1000;
+      MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * n * MILLIS_IN_A_SEC;
     return new Date(anniversary);
   }
 
@@ -219,7 +219,7 @@ export class MarsDate extends MarsDateBase {
    */
   public getSolarAzimuth(lat: number, lon: number) {
     const compassAngle = this.getCompassAngleOfSun(lat, lon);
-    return (360 + compassAngle) % 360;
+    return (DEGREES_IN_A_CIRCLE + compassAngle) % DEGREES_IN_A_CIRCLE;
   }
 
   /****************************************************
