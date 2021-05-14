@@ -82,6 +82,7 @@ export const DAYS_IN_YEAR = 365.25;
 export const DAYS_IN_CENTURY = 36525;
 
 // Earth Orbital Data
+// https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
 export const EARTH_SEMI_MAJOR_AXIS = 1.00000011; // AU
 export const EARTH_ECCENTRICITY = 0.01671022;
 

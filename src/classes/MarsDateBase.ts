@@ -349,18 +349,33 @@ export class MarsDateBase {
     );
   }
 
-  // Determine the longitude of the Earth
+  // Determine the heliocentric longitude of the Earth
   private setEarthHeliocentricLongitude() {
-    const earthOrbitEpoch = new Date("1996-08-25T00:00:00.000Z");
-    const elapsedDays = getDaysBetween(this.earthDate, earthOrbitEpoch);
+    // Uses 1996 Astronomical Ephemeris data
+    // EPOCH = 25th August 1996 00:00 UTC
+    // http://www.stargazing.net/kepler/circle.html
+    const DAILY_MOTION_IN_DEGREES = 0.9855931;
+    const LON_AT_EPOCH = 333.586;
+    const EPHEMERIS = new Date("1996-08-25T00:00:00.000Z");
 
-    return (0.9855931 * elapsedDays + 333.586) % DEGREES_IN_A_CIRCLE;
+    const elapsedDays = getDaysBetween(this.earthDate, EPHEMERIS);
+
+    return (
+      360 +
+      ((DAILY_MOTION_IN_DEGREES * elapsedDays + LON_AT_EPOCH) %
+        DEGREES_IN_A_CIRCLE)
+    );
   }
 
   // Determine distance of the Earth from the Sun
+  // Sets value in Astronomical Units
   private setEarthHeliocentricDistance() {
+    // Uses epoch of Jan 2 2002, 14:09 UTC as Perihelion
+    // Earth perihelion and aphelion Table Courtesy of Fred Espenak, www.Astropixels.com
     const perihelion = new Date("2002-01-02T14:09:00.000Z");
+
     const daysSincePerihelion = getDaysBetween(this.earthDate, perihelion);
+
     const trueAnomaly =
       (daysSincePerihelion / DAYS_IN_YEAR) * DEGREES_IN_A_CIRCLE;
 
@@ -371,15 +386,13 @@ export class MarsDateBase {
   }
 
   private setEarthMarsDistance() {
-    let angle: number;
-
     const lons = [
       this._earthHeliocentricLongitude,
       this._heliocentricLongitude,
     ];
     lons.sort((a, b) => b - a);
 
-    angle = lons[0] - lons[1];
+    let angle = lons[0] - lons[1];
     angle = angle > 180 ? 360 - angle : angle;
 
     // find distance between Earth and Mars using law of cosines.
@@ -394,6 +407,7 @@ export class MarsDateBase {
     );
   }
 
+  // Returns number of seconds it takes to cross distance of Earth and Mars at speed of light
   private setLightDelay() {
     return (this.earthMarsDistance * ASTRONOMICAL_UNIT * 1000) / SPEED_OF_LIGHT;
   }
