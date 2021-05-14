@@ -26,7 +26,7 @@ import {
   SPEED_OF_LIGHT,
   ASTRONOMICAL_UNIT,
 } from "../constants";
-import { cos, sin, tan, acos, atan2 } from "../helpers";
+import { cos, sin, tan, acos, atan2, getDaysBetween } from "../helpers";
 
 export class MarsDateBase {
   protected earthDate: Date;
@@ -349,12 +349,10 @@ export class MarsDateBase {
     );
   }
 
-  // Determine the longitude of the Earth at this time
+  // Determine the longitude of the Earth
   private setEarthHeliocentricLongitude() {
     const earthOrbitEpoch = new Date("1996-08-25T00:00:00.000Z");
-    const elapsedMillis =
-      this.millisecondsSinceEpoch - earthOrbitEpoch.getTime();
-    const elapsedDays = elapsedMillis / MS_PER_DAY;
+    const elapsedDays = getDaysBetween(this.earthDate, earthOrbitEpoch);
 
     return (0.9855931 * elapsedDays + 333.586) % DEGREES_IN_A_CIRCLE;
   }
@@ -362,8 +360,7 @@ export class MarsDateBase {
   // Determine distance of the Earth from the Sun
   private setEarthHeliocentricDistance() {
     const perihelion = new Date("2002-01-02T14:09:00.000Z");
-    const daysSincePerihelion =
-      (this.earthDate.getTime() - perihelion.getTime()) / MS_PER_DAY;
+    const daysSincePerihelion = getDaysBetween(this.earthDate, perihelion);
     const trueAnomaly =
       (daysSincePerihelion / DAYS_IN_YEAR) * DEGREES_IN_A_CIRCLE;
 

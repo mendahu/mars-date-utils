@@ -242,6 +242,8 @@ export class MarsDate extends MarsDateBase {
 
   /**
    *
+   * Measures the time it would take for a one-way radio signal (travelling at the speed of light) to cross from Earth to Mars.
+   *
    * @returns Time it takes for light to travel between the Earth and Mars (seconds)
    */
   public getLightDelay() {
