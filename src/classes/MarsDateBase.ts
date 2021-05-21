@@ -27,6 +27,7 @@ import {
   ASTRONOMICAL_UNIT,
   MILLIS_IN_A_SEC,
   HOURS_IN_A_DAY,
+  MARS_MILLIS_IN_A_YEAR,
 } from "../constants";
 import { cos, sin, tan, acos, atan2, getDaysBetween } from "../helpers";
 
@@ -105,8 +106,7 @@ export class MarsDateBase {
   // Determine the Mars Year of given date
   private setMarsYear() {
     const marsYearsSinceMarsEpoch =
-      this.millisecondsSinceMarsEpoch /
-      (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * MILLIS_IN_A_SEC);
+      this.millisecondsSinceMarsEpoch / MARS_MILLIS_IN_A_YEAR;
     return Math.floor(marsYearsSinceMarsEpoch);
   }
 
