@@ -4,7 +4,7 @@ import {
   ASTRONOMICAL_UNIT,
   DEGREES_IN_A_CIRCLE,
   HOURS_IN_A_DAY,
-  MARS_SECONDS_IN_SOL,
+  MARS_MILLIS_IN_A_YEAR,
   MARS_SOLS_IN_YEAR,
   MILLIS_IN_A_SEC,
 } from "../constants";
@@ -151,9 +151,7 @@ export class MarsDate extends MarsDateBase {
    * console.log(secondBirthday) // "2016-05-11T04:18:36.481Z", 2 Mars Years from Landing
    */
   public getAnniversary(n: number) {
-    const anniversary =
-      this.millisecondsSinceEpoch +
-      MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * n * MILLIS_IN_A_SEC;
+    const anniversary = this.millisecondsSinceEpoch + MARS_MILLIS_IN_A_YEAR;
     return new Date(anniversary);
   }
 

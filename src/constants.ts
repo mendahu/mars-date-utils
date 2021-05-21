@@ -90,8 +90,7 @@ export const EARTH_ECCENTRICITY = 0.01671022;
 // Mars time Constants
 export const MARS_YEAR_EPOCH = -524102400000; // April 1, 1955, 00:00 UTC
 export const MARS_SOLS_IN_YEAR = 668.5991;
-export const MARS_SECONDS_IN_SOL = 88775.244; // 24 hours, 39 minutes, 35.244 seconds
-export const MARS_MILLIS_IN_A_YEAR = 59355048240.680405; // SOLS_IN_A_YEAR * SECS_IN_A_SOL * 1000
+export const MARS_MILLIS_IN_A_YEAR = 59355048240.680405; // SOLS_IN_A_YEAR * SECS_IN_A_SOL (88775.244 - 24 hours, 39 minutes, 35.244 seconds) * 1000
 
 // Mars Orbital Data
 export const MARS_SEMI_MAJOR_AXIS = 1.52367934; // AU
