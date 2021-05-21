@@ -1,10 +1,14 @@
 // Based on Allison and McEwen (2000) and revision from the Mars24 Sunclock
 // https://www.giss.nasa.gov/tools/mars24/help/algorithm.html
 
+// Earth Longitude calculated using
+// http://www.stargazing.net/kepler/circle.html
+
+// Earth Perhelion date taken from
+// http://www.astropixels.com/ephemeris/perap2001.html
+
 import {
   LEAP_SECONDS,
-  MARS_SECONDS_IN_SOL,
-  MARS_SOLS_IN_YEAR,
   MARS_YEAR_EPOCH,
   PERTURBERS,
   TAI_UTC_DIFF,
@@ -12,21 +16,29 @@ import {
   DAYS_IN_CENTURY,
   SECS_PER_DAY,
   DEGREES_IN_A_CIRCLE,
+  LEAP_SECOND_EPOCH,
+  EARTH_SEMI_MAJOR_AXIS,
+  EARTH_ECCENTRICITY,
+  DAYS_IN_YEAR,
+  MARS_SEMI_MAJOR_AXIS,
+  SPEED_OF_LIGHT,
+  ASTRONOMICAL_UNIT,
+  MILLIS_IN_A_SEC,
+  HOURS_IN_A_DAY,
+  MARS_MILLIS_IN_A_YEAR,
 } from "../constants";
-
-const cos = (deg: number) => Math.cos((deg * Math.PI) / 180);
-const sin = (deg: number) => Math.sin((deg * Math.PI) / 180);
+import { cos, sin, tan, acos, atan2, getDaysBetween } from "../helpers";
 
 export class MarsDateBase {
   protected earthDate: Date;
   protected millisecondsSinceEpoch: number;
-  protected millisecondsSinceLeapSecondEpoch: number;
   protected millisecondsSinceMarsEpoch: number;
 
   // Age Properties
   protected ageInSeconds: number;
   protected ageInSols: number;
   protected ageInYears: number;
+  protected marsSolDate: number;
 
   //Properties used to calculate other properties
   private _julianDateUT: number;
@@ -39,20 +51,27 @@ export class MarsDateBase {
   private _perturbers: number;
   private _marsEquationOfCenter: number;
   private _marsEquationOfTime: number;
+  private _heliocentricLongitude: number;
+  private _solarDeclination: number;
+  private _subsolarLongitude: number;
 
-  protected marsSolDate: number;
+  // Earth Properties
+  private _earthHeliocentricLongitude: number;
+  protected earthHeliocentricDistance: number;
 
   // Basic Date properties
   protected MY: number;
   protected Ls: number;
   protected MST: number;
 
+  // Advanced Date Properties
+  protected heliocentricDistance: number;
+  protected earthMarsDistance: number;
+  protected lightDelay: number;
+
   constructor(earthDate: Date) {
     this.earthDate = earthDate;
     this.millisecondsSinceEpoch = earthDate.getTime(); // A-1
-    this.millisecondsSinceLeapSecondEpoch = new Date(
-      "1972-01-01T00:00:00.000Z"
-    ).getTime(); // A-1
     this.millisecondsSinceMarsEpoch = this.setMilliSecondsSinceMarsEpoch();
     this.MY = this.setMarsYear();
     this._julianDateUT = this.getJulianDateUT(); // A-2
@@ -68,17 +87,24 @@ export class MarsDateBase {
     this._marsEquationOfTime = this.getMarsEquationOfTime(); // C-1
     this.marsSolDate = this.getMarsSolDate();
     this.MST = this.getMeanSolarTime(); // C-2
+    this._subsolarLongitude = this.setSubsolarLongitude(); // C-5
+    this._solarDeclination = this.setSolarDeclination(); // D-1
+    this.heliocentricDistance = this.setHeliocentricDistance(); // D-2
+    this._heliocentricLongitude = this.setHeliocentricLongitude(); // D-3
+    this._earthHeliocentricLongitude = this.setEarthHeliocentricLongitude();
+    this.earthHeliocentricDistance = this.setEarthHeliocentricDistance();
+    this.earthMarsDistance = this.setEarthMarsDistance();
+    this.lightDelay = this.setLightDelay();
   }
 
   private setMilliSecondsSinceMarsEpoch() {
-    return this.millisecondsSinceEpoch - MARS_YEAR_EPOCH.getTime();
+    return this.millisecondsSinceEpoch - MARS_YEAR_EPOCH;
   }
 
   // Determine the Mars Year of given date
   private setMarsYear() {
     const marsYearsSinceMarsEpoch =
-      this.millisecondsSinceMarsEpoch /
-      (MARS_SECONDS_IN_SOL * MARS_SOLS_IN_YEAR * 1000);
+      this.millisecondsSinceMarsEpoch / MARS_MILLIS_IN_A_YEAR;
     return Math.floor(marsYearsSinceMarsEpoch);
   }
 
@@ -107,7 +133,7 @@ export class MarsDateBase {
   ) {
     const leapSecondsArray = Object.keys(LEAP_SECONDS);
 
-    if (millis >= this.millisecondsSinceLeapSecondEpoch) {
+    if (millis >= LEAP_SECOND_EPOCH) {
       const leapSecondsIndex = leapSecondsArray.findIndex(
         (ls) => Number(ls) >= millis
       );
@@ -232,15 +258,16 @@ export class MarsDateBase {
   // C-2
   // Get Mean Solar Time at Mars Prime Meridian aka Airy Mean Time
   private getMeanSolarTime() {
-    return (24 * this.marsSolDate) % 24;
+    return (HOURS_IN_A_DAY * this.marsSolDate) % HOURS_IN_A_DAY;
   }
 
   // C-3
   // Determine Local Mean Solar Time at specific Longitude on Mars
   // Takes LON in degrees west of prime
   protected getLocalMeanSolarTime(lon: number) {
-    const time = this.getMeanSolarTime() - (lon * 24) / 360;
-    return (time + 24) % 24;
+    const time =
+      this.getMeanSolarTime() - (lon * HOURS_IN_A_DAY) / DEGREES_IN_A_CIRCLE;
+    return (time + HOURS_IN_A_DAY) % HOURS_IN_A_DAY;
   }
 
   // C-4
@@ -248,7 +275,137 @@ export class MarsDateBase {
   // Takes LON in degrees west of prime
   protected getLocalTrueSolarTime(lon: number) {
     return (
-      this.getLocalMeanSolarTime(lon) + this._marsEquationOfTime * (24 / 360)
+      this.getLocalMeanSolarTime(lon) +
+      this._marsEquationOfTime * (HOURS_IN_A_DAY / DEGREES_IN_A_CIRCLE)
+    );
+  }
+
+  // C-5
+  // Determine subsolar longitude
+  private setSubsolarLongitude() {
+    return (
+      (this.MST * 15 + this._marsEquationOfTime + 180) % DEGREES_IN_A_CIRCLE
+    );
+  }
+
+  // D-1
+  // Deterine Planetrographic Solar Declination
+  private setSolarDeclination() {
+    const radians = Math.asin(0.42565 * sin(this.Ls));
+    return (radians * 180) / Math.PI + 0.25 * sin(this.Ls);
+  }
+
+  // D-2
+  // Determine Heliocentric Distance (distance from the sun)
+  private setHeliocentricDistance() {
+    const M = this._marsMeanAnomaly;
+    return (
+      MARS_SEMI_MAJOR_AXIS *
+      (1.00436 -
+        0.09309 * cos(M) -
+        0.004336 * cos(2 * M) -
+        0.00031 * cos(3 * M) -
+        0.00003 * cos(4 * M))
+    );
+  }
+
+  // D-3
+  // Determine heliocentric longitude
+  private setHeliocentricLongitude() {
+    const lon =
+      this.Ls +
+      85.061 -
+      0.015 * sin(71 + 2 * this.Ls) -
+      5.5e-6 * this._j2000offsetTT;
+
+    return lon % DEGREES_IN_A_CIRCLE;
+  }
+
+  // D-5
+  // Determine Zenith Angle of the Sun
+  protected getZenithAngleOfSun(lat: number, lon: number) {
+    return acos(
+      sin(this._solarDeclination) * sin(lat) +
+        cos(this._solarDeclination) *
+          cos(lat) *
+          cos(lon - this._subsolarLongitude)
+    );
+  }
+
+  // D-6
+  // Determine Compass Angle
+  protected getCompassAngleOfSun(lat: number, lon: number) {
+    const hourAngle = lon - this._subsolarLongitude;
+    return atan2(
+      sin(hourAngle),
+      cos(lat) * tan(this._solarDeclination) - sin(lat) * cos(hourAngle)
+    );
+  }
+
+  // Determine the heliocentric longitude of the Earth
+  private setEarthHeliocentricLongitude() {
+    // Uses 1996 Astronomical Ephemeris data
+    // EPOCH = 25th August 1996 00:00 UTC
+    // http://www.stargazing.net/kepler/circle.html
+    const DAILY_MOTION_IN_DEGREES = 0.9855931;
+    const LON_AT_EPOCH = 333.586;
+    const EPHEMERIS = new Date("1996-08-25T00:00:00.000Z");
+
+    const elapsedDays = getDaysBetween(this.earthDate, EPHEMERIS);
+
+    return (
+      DEGREES_IN_A_CIRCLE +
+      ((DAILY_MOTION_IN_DEGREES * elapsedDays + LON_AT_EPOCH) %
+        DEGREES_IN_A_CIRCLE)
+    );
+  }
+
+  // Determine distance of the Earth from the Sun
+  // Sets value in Astronomical Units
+  private setEarthHeliocentricDistance() {
+    // Uses epoch of Jan 2 2002, 14:09 UTC as Perihelion
+    // Earth perihelion and aphelion Table Courtesy of Fred Espenak, www.Astropixels.com
+    const perihelion = new Date("2002-01-02T14:09:00.000Z");
+
+    const daysSincePerihelion = getDaysBetween(this.earthDate, perihelion);
+
+    const trueAnomaly =
+      (daysSincePerihelion / DAYS_IN_YEAR) * DEGREES_IN_A_CIRCLE;
+
+    // http://curious.astro.cornell.edu/our-solar-system/41-our-solar-system/the-earth/orbit/80-how-can-i-find-the-distance-to-the-sun-on-any-given-day-advanced
+    return (
+      (EARTH_SEMI_MAJOR_AXIS * (1 - EARTH_ECCENTRICITY * EARTH_ECCENTRICITY)) /
+      (1 + EARTH_ECCENTRICITY * cos(trueAnomaly))
+    );
+  }
+
+  private setEarthMarsDistance() {
+    const lons = [
+      this._earthHeliocentricLongitude,
+      this._heliocentricLongitude,
+    ];
+    lons.sort((a, b) => b - a);
+
+    let angle = lons[0] - lons[1];
+    angle = angle > 180 ? DEGREES_IN_A_CIRCLE - angle : angle;
+
+    // find distance between Earth and Mars using law of cosines.
+    // Assumes no orbital inclination of either planet for simplicity.
+    return Math.sqrt(
+      Math.pow(this.earthHeliocentricDistance, 2) +
+        Math.pow(this.heliocentricDistance, 2) -
+        2 *
+          this.earthHeliocentricDistance *
+          this.heliocentricDistance *
+          cos(angle)
+    );
+  }
+
+  // Returns number of seconds it takes to cross distance of Earth and Mars at speed of light
+  private setLightDelay() {
+    return (
+      (this.earthMarsDistance * ASTRONOMICAL_UNIT * MILLIS_IN_A_SEC) /
+      SPEED_OF_LIGHT
     );
   }
 }
