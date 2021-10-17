@@ -151,7 +151,7 @@ export class MarsDate extends MarsDateBase {
    * console.log(secondBirthday) // "2016-05-11T04:18:36.481Z", 2 Mars Years from Landing
    */
   public getAnniversary(n: number) {
-    const anniversary = this.millisecondsSinceEpoch + MARS_MILLIS_IN_A_YEAR;
+    const anniversary = this.millisecondsSinceEpoch + MARS_MILLIS_IN_A_YEAR * n;
     return new Date(anniversary);
   }
 
